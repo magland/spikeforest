@@ -1,0 +1,25 @@
+import setuptools
+
+pkg_name="spikeforest"
+
+setuptools.setup(
+    name=pkg_name,
+    version="0.1.0",
+    author="Jeremy Magland",
+    author_email="jmagland@flatironinstitute.org",
+    description="",
+    url="https://github.com/magland/spikeforest",
+    packages=setuptools.find_packages(),
+    install_requires=[
+        'numpy',
+        'matplotlib',
+        'spikeinterface',
+        'spikewidgets',
+        'spiketoolkit'
+    ],
+    classifiers=(
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+    )
+)
