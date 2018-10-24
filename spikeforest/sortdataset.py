@@ -57,7 +57,7 @@ def sortDataset(
         sorting_processor_version=sorting_processor.VERSION,
         firings=outputs['firings_out']
     )
-    kb.uploadFile(outputs['firings_out'])
+    kb.saveFile(outputs['firings_out'])
     return result
 
 def _create_temporary_fname(ext):
