@@ -1,4 +1,4 @@
-FROM magland/jp_proxy_widget:20180831
+FROM python:3.6-stretch
 
 RUN apt-get update && apt-get install -y build-essential
 
