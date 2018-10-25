@@ -4,18 +4,24 @@ pkg_name="spikeforest"
 
 setuptools.setup(
     name=pkg_name,
-    version="0.1.0",
+    version="0.1.4",
     author="Jeremy Magland",
     author_email="jmagland@flatironinstitute.org",
     description="",
     url="https://github.com/magland/spikeforest",
     packages=setuptools.find_packages(),
     install_requires=[
+        'pybind11',
+        'ml_ms4alg',
         'numpy',
         'matplotlib',
         'spikeinterface',
         'spikewidgets',
-        'spiketoolkit'
+        'spiketoolkit',
+        'kbucket',
+        'pillow',
+        'mlprocessors',
+        'pandas'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",

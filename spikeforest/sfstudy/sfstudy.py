@@ -17,7 +17,6 @@ class SFStudy():
   def loadDatasetsFromKBucket(self,*,kbucket_path,dataset_id_prefix=''):
     D=mlp.readDir(kbucket_path)
     for name in D['dirs']:
-      print ('Adding: '+name)
       DS=SFDataset(kbucket_path=kbucket_path+'/'+name)
       self.addDataset(dataset_id=dataset_id_prefix+name,dataset=DS)
 
