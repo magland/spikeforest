@@ -7,3 +7,7 @@ RUN pip install jupyterlab
 # force rebuild whenever the version in this file has changed
 ADD setup.py /setup.py
 RUN pip install spikeforest
+
+### Add this repo
+ADD . /working
+WORKDIR /working
