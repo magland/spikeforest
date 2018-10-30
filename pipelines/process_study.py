@@ -65,12 +65,13 @@ class Study():
                         kb.saveObject(key=lock_obj,object=result)
                     except:
                         pa.set(key=lock_obj,value='error',overwrite=True)
+                        raise
                 else:
                     val0=pa.get(key=lock_obj)
                     if val0 == 'running':
                         print ('Skipping (result is running)...')
                     else:
-                        print('Skipping (result is locked)...')
+                        print ('Skipping (result is locked)...')
     
     def _get_lock_object(self,sorter,dataset):
         return dict(
