@@ -1,25 +1,26 @@
 #!/usr/bin/env python
 
 import os
+import sys
 
 from kbucket import client as kb
 from pairio import client as pa
-from process_study import process_study
+from process_study import Study
 
-def main():
+def main(command):
     # Select the study
     study_dir='kbucket://b5ecdf1474c5/spikeforest/gen_synth_datasets/datasets_noise10_K20'
     study_name='synth_jfm_noise10_K20'
     num_datasets=None
 
     # Specify whether we want to read/write remotely
-    read_local=False
+    read_local=True
     write_local=True
-    read_remote=True
-    write_remote=True
+    read_remote=False
+    write_remote=False
     load_local=True
     load_remote=True
-    save_remote=True
+    save_remote=False
 
     # The following can be set for saving results
     PAIRIO_USER='spikeforest'
@@ -40,7 +41,35 @@ def main():
         kb.setConfig(upload_share_id=KBUCKET_SHARE_ID,upload_token=KBUCKET_UPLOAD_TOKEN)
         kb.testSaveRemote()
 
-    process_study(study_dir=study_dir,study_name=study_name,num_datasets=num_datasets)
+    study=Study(study_dir=study_dir,study_name=study_name)
+    
+    if command=='process':
+        study.process()
+    elif command=='clear':
+        study.clearResults()
+    elif command=='save':
+        results=study.getResults()
+        print ('Saving {} results...'.format(len(results)))
+        key=dict(
+            name='spikeforest_results',
+            study_name=study_name
+        )
+        kb.saveObject(key=key,object=results)
+        print ('Saved under key:')
+        print (key)
+    else:
+        raise Error('Unrecognized command: '+command)
 
+def print_usage():
+    print('Usage:')
+    print('./process_study_driver.py process')
+    print('./process_study_driver.py save')
+    print('./process_study_driver.py clear')
+        
 if __name__== "__main__":
-  main()
+    argv=sys.argv
+    if len(argv)<2:
+        print_usage()
+        sys.exit(-1)
+    command=argv[1]
+    main(command)
