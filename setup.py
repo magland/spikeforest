@@ -4,7 +4,7 @@ pkg_name="spikeforest"
 
 setuptools.setup(
     name=pkg_name,
-    version="0.1.8",
+    version="0.1.9",
     author="Jeremy Magland",
     author_email="jmagland@flatironinstitute.org",
     description="",
