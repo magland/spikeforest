@@ -1,0 +1,14 @@
+Bootstrap:docker
+From: python:3.6
+
+%setup
+  mkdir ${SINGULARITY_ROOTFS}/src
+  cp -r . ${SINGULARITY_ROOTFS}/src/spikeforest
+
+%post
+
+	apt-get update && apt-get install -y build-essential
+
+	cd /src/spikeforest
+	pip install .
+
