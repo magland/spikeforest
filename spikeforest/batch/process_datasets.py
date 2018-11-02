@@ -214,7 +214,7 @@ class CreateWaveformsPlot(mlpr.Processor):
     units=S.getUnitIds()
     if len(units)>20:
       units=units[::int(len(units)/20)]
-    sw.UnitWaveformsWidget(recording=R,sorting=S,channels=channels,units=[1]).plot()
+    sw.UnitWaveformsWidget(recording=R,sorting=S,channels=channels,unit_ids=units).plot()
     save_plot(self.jpg_out)
     
 def create_waveforms_plot(dataset,firings):
