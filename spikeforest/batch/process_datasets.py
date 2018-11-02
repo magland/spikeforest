@@ -209,8 +209,12 @@ class CreateWaveformsPlot(mlpr.Processor):
     R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     S=si.MdaSortingExtractor(firings_file=self.firings)
     channels=R.getChannelIds()
-    if len(channels)>20: channels=channels[0:20]
-    sw.UnitWaveformsWidget(recording=R,sorting=S,channels=channels).plot()
+    if len(channels)>20:
+      channels=channels[0:20]
+    units=S.getUnitIds()
+    if len(units)>20:
+      units=units[::int(len(units)/20)]
+    sw.UnitWaveformsWidget(recording=R,sorting=S,channels=channels,units=[1]).plot()
     save_plot(self.jpg_out)
     
 def create_waveforms_plot(dataset,firings):
