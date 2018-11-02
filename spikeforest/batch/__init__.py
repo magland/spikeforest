@@ -1,1 +1,1 @@
-from .process_datasets import process_datasets, clear_dataset_results, assemble_dataset_results
+from .process_datasets import process_datasets, clear_dataset_results, assemble_dataset_results, try_process_dataset

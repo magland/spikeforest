@@ -33,6 +33,16 @@ def process_datasets(run_code=default_run_code):
   for i,task in enumerate(tasks):
     print('Processing task {} of {}'.format(i+1,len(tasks)))
     task.execute()
+    
+def try_process_dataset(study_name,dataset_name,run_code=default_run_code):
+  tasks=load_tasks(run_code=run_code)
+  for task in tasks:
+    ds=task.dataset()
+    if ds['study']==study_name:
+      if ds['name']==dataset_name:
+        result=task.run()
+        return result
+  raise Exception('Not found')
 
 def assemble_dataset_results(run_code=default_run_code):
   tasks=load_tasks(run_code=run_code)
@@ -78,6 +88,9 @@ class ProcessDatasetTask():
     self._key=key
     self._dataset=dataset
     self._code=''.join(random.choice(string.ascii_uppercase) for x in range(10))
+    
+  def dataset(self):
+    return self._dataset
     
   def clearResults(self,*,in_process_only):
     val=pa.get(self._key)
@@ -183,12 +196,39 @@ def create_timeseries_plot(dataset):
   kb.saveFile(out)
   return 'sha1://'+kb.computeFileSha1(out)+'/timeseries.jpg'
 
+# A MountainLab processor for generating a plot of a portion of the timeseries
+class CreateWaveformsPlot(mlpr.Processor):
+  NAME='CreateWaveformsPlot'
+  VERSION='0.1.0'
+  recording_dir=mlpr.Input(directory=True,description='Recording directory')
+  firings=mlpr.Input(description='Firings file')
+  jpg_out=mlpr.Output('The plot as a .jpg file')
+  
+  def run(self):
+    R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=True)
+    R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
+    S=si.MdaSortingExtractor(firings_file=self.firings)
+    channels=R.getChannelIds()
+    if len(channels)>20: channels=channels[0:20]
+    sw.UnitWaveformsWidget(recording=R,sorting=S,channels=channels).plot()
+    save_plot(self.jpg_out)
+    
+def create_waveforms_plot(dataset,firings):
+  out=CreateWaveformsPlot.execute(recording_dir=dataset['directory'],firings=firings,jpg_out={'ext':'.jpg'}).outputs['jpg_out']
+  kb.saveFile(out)
+  return 'sha1://'+kb.computeFileSha1(out)+'/waveforms.jpg'
+
 def process_dataset(dataset):
   ret=deepcopy(dataset)
-  ret['computed_info']=compute_dataset_info(dataset)
+  ret['computed_info']=compute_dataset_info(dataset)  
+  firings_true_path=dataset['directory']+'/firings_true.mda'
+  if kb.findFile(firings_true_path):
+    ret['ground_truth']=firings_true_path
   ret['plots']=dict(
-      timeseries=create_timeseries_plot(dataset)
+    timeseries=create_timeseries_plot(dataset)
   )
+  if ret['ground_truth']:
+    ret['plots']['waveforms_true']=create_waveforms_plot(dataset,ret['ground_truth'])
   return ret
 
     
