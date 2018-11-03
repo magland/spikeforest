@@ -27,11 +27,20 @@ def clear_dataset_results(in_process_only,run_code=default_run_code):
   
   print('Done.')
 
+def download_datasets(run_code=default_run_code):
+  tasks=load_tasks(run_code=run_code)
+
+  for i,task in enumerate(tasks):
+    ds=task.dataset()
+    print('Task {} of {}: {}'.format(i+1,len(tasks),ds['name']))
+    dsdir=ds['directory']
+    kb.realizeFile(dsdir+'/raw.mda')
+
 def process_datasets(run_code=default_run_code):
   tasks=load_tasks(run_code=run_code)
 
   for i,task in enumerate(tasks):
-    print('Processing task {} of {}'.format(i+1,len(tasks)))
+    print('Processing task {} of {}: {}'.format(i+1,len(tasks),ds['name']))
     task.execute()
     
 def try_process_dataset(study_name,dataset_name,run_code=default_run_code):
