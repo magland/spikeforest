@@ -8,48 +8,79 @@ import os, shutil
 from kbucket import client as kb
 from pairio import client as pa
 
-def process_study(*,study_dir,study_name,num_datasets=None):
-    #Define the spike sorters
-    sorters=[]
-    ms4_params=dict(
-        detect_sign=-1,
-        adjacency_radius=-1,
-        detect_threshold=3
-    )
-    sorters.append(dict(
-        name='MountainSort4',
-        processor=sf.MountainSort4,
-        params=ms4_params
-    ))
-    
-    # Define the datasets by reading the study directory
-    datasets=[]
-    dd=kb.readDir(study_dir)
-    for dsname in dd['dirs']:
-        dsdir='{}/{}'.format(study_dir,dsname)
-        datasets.append(dict(
-            name=dsname,
-            dataset_dir=dsdir
+class Study():
+    def __init__(self,study_dir,study_name):
+        #Define the spike sorters
+        self._sorters=[]
+        ms4_params=dict(
+            detect_sign=-1,
+            adjacency_radius=-1,
+            detect_threshold=3
+        )
+        self._sorters.append(dict(
+            processor=sf.MountainSort4,
+            params=ms4_params
         ))
-    if num_datasets is not None:
-        datasets=datasets[0:num_datasets]
 
-    # Run the pipeline
-    results=[]
-    for dataset in datasets:
-        for sorter in sorters:
-            print ('SORTER: {}     DATASET: {}'.format(sorter['name'],dataset['name']))
-            result=sf.sortDataset(
-                sorter=sorter,
-                dataset=dataset,
-                _force_run=False
-            )
-            result['comparison_with_truth']=sf.compareWithTruth(result)
-            result['summary']=sf.summarizeSorting(result)
-            results.append(result)
-        #break
-    print ('Saving results object...')
+        # Define the datasets by reading the study directory
+        self._datasets=[]
+        dd=kb.readDir(study_dir)
+        for dsname in dd['dirs']:
+            dsdir='{}/{}'.format(study_dir,dsname)
+            self._datasets.append(dict(
+                name=dsname,
+                dataset_dir=dsdir
+            ))
+            
+    def clearResults(self):
+        for dataset in self._datasets:
+            for sorter in self._sorters:
+                lock_obj=self._get_lock_object(sorter,dataset)
+                pa.set(key=lock_obj,value=None)
+                
+    def getResults(self):
+        results=[]
+        for dataset in self._datasets:
+            for sorter in self._sorters:
+                lock_obj=self._get_lock_object(sorter,dataset)
+                result=pa.get(key=lock_obj)
+                results.append(result)
+        return results
     
-    # Save the results
-    kb.saveObject(results,key=dict(name='spikeforest_results',study_name=study_name))
-    print ('Done.')
+    def process(self):
+        for dataset in self._datasets:
+            for sorter in self._sorters:
+                print ('SORTER: {}     DATASET: {}'.format(sorter['processor'].NAME,dataset['name']))
+                lock_obj=self._get_lock_object(sorter,dataset)
+
+                if pa.set(key=lock_obj,value='running',overwrite=False):
+                    try:
+                        print ('Running...')
+                        result=sf.sortDataset(
+                            sorter = sorter,
+                            dataset = dataset
+                        )
+                        result['comparison_with_truth'] = sf.compareWithTruth(result)
+                        result['summary'] = sf.summarizeSorting(result)
+                        kb.saveObject(key=lock_obj,object=result)
+                    except:
+                        pa.set(key=lock_obj,value='error',overwrite=True)
+                        raise
+                else:
+                    val0=pa.get(key=lock_obj)
+                    if val0 == 'running':
+                        print ('Skipping (result is running)...')
+                    else:
+                        print ('Skipping (result is locked)...')
+    
+    def _get_lock_object(self,sorter,dataset):
+        return dict(
+            dataset=dataset,
+            sorter=dict(
+                name=sorter['processor'].NAME,
+                version=sorter['processor'].VERSION,
+                params=sorter['params']
+            )
+        )
+
+    
