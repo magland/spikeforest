@@ -44,7 +44,7 @@ def sortDataset(
     dataset,
     _force_run=False
 ):
-    dsdir=dataset['dataset_dir']
+    dsdir=dataset['directory']
     sorting_params=sorter['params']
     sorting_processor=sorter['processor']
     outputs=sorting_processor.execute(dataset_dir=dsdir,firings_out=dict(ext='.mda'),**sorting_params,_force_run=_force_run).outputs
