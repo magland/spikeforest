@@ -55,15 +55,26 @@ def try_sort_dataset(*,study_name,dataset_name,sorter_name,run_code=default_run_
 def load_sorters():
     sorters=[]
 
-    ms4_params=dict(
+    ms4_p1=dict(
         detect_sign=-1,
         adjacency_radius=-1,
         detect_threshold=3
     )
+    ms4_p2=dict(
+        detect_sign=-1,
+        adjacency_radius=-1,
+        detect_threshold=5
+    )
+    
     sorters.append(dict(
         name='MountainSort4-p1',
         processor=sf.MountainSort4,
-        params=ms4_params
+        params=ms4_p1
+    ))
+    sorters.append(dict(
+        name='MountainSort4-p2',
+        processor=sf.MountainSort4,
+        params=ms4_p2
     ))
     return sorters
 
