@@ -4,6 +4,7 @@ from pairio import client as pa
 import random
 import string
 import json
+from copy import deepcopy
 
 default_run_code='0'
 
@@ -74,6 +75,7 @@ def sort_dataset(sorter,dataset):
         processor_version=sorter['processor'].VERSION,
         sorting_params=sorter['params']
     )
+    ret['dataset']=deepcopy(dataset)
     result=sf.sortDataset(
         sorter = sorter,
         dataset = dataset
