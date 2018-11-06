@@ -5,3 +5,4 @@ from .summarizesorting import summarizeSorting
 from .comparewithtruth import compareWithTruth
 from .kbucketconfig import kbucketConfigLocal, kbucketConfigRemote
 from . import batch
+from . import sorters
