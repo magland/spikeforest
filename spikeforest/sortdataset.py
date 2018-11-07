@@ -1,9 +1,10 @@
 from kbucket import client as kb
 import spikeinterface as si
-import spiketoolkit as st
+import spikeforest as sf
 import tempfile
 import random
 import mlprocessors as mlpr
+import os
 
 class MountainSort4(mlpr.Processor):
     NAME='MountainSort4'
@@ -24,7 +25,8 @@ class MountainSort4(mlpr.Processor):
     
     def run(self):
         recording=si.MdaRecordingExtractor(self.dataset_dir)
-        sorting=st.sorters.mountainsort4(
+        num_workers=os.environ.get('NUM_WORKERS',None)
+        sorting=sf.sorters.mountainsort4(
             recording=recording,
             detect_sign=self.detect_sign,
             adjacency_radius=self.adjacency_radius,
@@ -34,7 +36,8 @@ class MountainSort4(mlpr.Processor):
             clip_size=self.clip_size,
             detect_threshold=self.detect_threshold,
             detect_interval=self.detect_interval,
-            noise_overlap_threshold=self.noise_overlap_threshold
+            noise_overlap_threshold=self.noise_overlap_threshold,
+            num_workers=num_workers
         )
         si.MdaSortingExtractor.writeSorting(sorting=sorting,save_path=self.firings_out)
 
@@ -44,7 +47,7 @@ def sortDataset(
     dataset,
     _force_run=False
 ):
-    dsdir=dataset['dataset_dir']
+    dsdir=dataset['directory']
     sorting_params=sorter['params']
     sorting_processor=sorter['processor']
     outputs=sorting_processor.execute(dataset_dir=dsdir,firings_out=dict(ext='.mda'),**sorting_params,_force_run=_force_run).outputs

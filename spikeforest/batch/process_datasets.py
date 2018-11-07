@@ -59,19 +59,24 @@ def assemble_dataset_results(run_code=default_run_code):
 
   results=[]
   for i,task in enumerate(tasks):
-    print('Loading result for task {} of {}'.format(i+1,len(tasks)))
+    print('Loading result for task {} of {}: {}/{}'.format(i+1,len(tasks),task.dataset()['study'],task.dataset()['name']))
     result=task.loadResult()
     if not result:
       raise Exception('Unable to load result for task.')
     results.append(result)
 
-  print('Saving results...')
+  key1=dict(name='spikeforest_studies')
+  key2=dict(name='spikeforest_studies_processed')
+  print('Saving results to... key={}'.format(json.dumps(key2)))
   obj=kb.loadObject(
-    key=dict(name='spikeforest_studies'),
+    key=key1,
     share_ids=['spikeforest.spikeforest1']
   )
   obj['datasets']=results;
-  kb.saveObject(obj,key=dict(name='spikeforest_studies_processed'))
+  datasets=obj['datasets']
+  for ds in datasets:
+      print(ds['study'],ds['name'])
+  kb.saveObject(obj,key=key2)
 
 
 def load_tasks(run_code):
@@ -85,6 +90,7 @@ def load_tasks(run_code):
   for i,ds in enumerate(datasets):
     key=dict(
             script='process_datasets',
+            study_name=ds['study'],
             dataset_name=ds['name'],
             run_code=run_code
         )
