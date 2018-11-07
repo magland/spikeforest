@@ -9,8 +9,9 @@ export NUMEXPR_NUM_THREADS=$NUM_WORKERS
 export OMP_NUM_THREADS=$NUM_WORKERS
 
 config=$1
+parallel_prefix=$2
 
 python driver_sf_batch.py prepare $config
-python driver_sf_batch.py run $config
+$parellel_prefix python driver_sf_batch.py run $config
 #srun -c 2 -n 40 python driver_sf_batch.py run $config
 python driver_sf_batch.py assemble $config
