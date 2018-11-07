@@ -6,3 +6,4 @@ from .comparewithtruth import compareWithTruth
 from .kbucketconfig import kbucketConfigLocal, kbucketConfigRemote
 from . import batch
 from . import sorters
+from . import sf_batch
