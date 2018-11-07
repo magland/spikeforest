@@ -53,8 +53,7 @@ def sf_batch_run(config):
     sorters=config['sorters']
     
     code=''.join(random.choice(string.ascii_uppercase) for x in range(10))
-    for ds in datasets:
-        print('RUN: {}/{}'.format(ds['study'],ds['name']))
+    for i,ds in enumerate(datasets):
         key=dict(
             name='process_dataset',
             batch_name=config['batch_name'],
@@ -63,7 +62,7 @@ def sf_batch_run(config):
         )
         if acquire_lock_for_key(key=key,code=code):
             try:
-                print('Processing dataset: {}/{}'.format(ds['study'],ds['name']))
+                print('========= Processing dataset {}/{}: {}/{}'.format(i+1,len(datasets),ds['study'],ds['name']))
                 result0=sf_process_dataset(ds)
             except:
                 pa.set(key=key,value='error-'+code)
@@ -84,7 +83,7 @@ def sf_batch_run(config):
             )
             if acquire_lock_for_key(key=key,code=code):
                 try:
-                    print('Sorting dataset: {} - {}/{}'.format(sorter['name'],ds['study'],ds['name']))
+                    print('========= Sorting dataset {}/{}: {} - {}/{}'.format(i,len(datasets),sorter['name'],ds['study'],ds['name']))
                     result0=sf_sort_dataset(sorter,ds)
                 except:
                     pa.set(key=key,value='error-'+code)
