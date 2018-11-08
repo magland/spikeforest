@@ -117,6 +117,7 @@ def sf_sort_dataset(sorter,dataset):
     result=dict(
         dataset_name=dataset['name'],
         study_name=dataset['study'],
+        sorter_name=sorter['name'],
         dataset_dir=dsdir,
         firings_true=dsdir+'/firings_true.mda',
         sorting_params=sorting_params,

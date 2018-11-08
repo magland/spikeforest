@@ -54,24 +54,6 @@ def sf_batch_run(config):
     
     code=''.join(random.choice(string.ascii_uppercase) for x in range(10))
     for i,ds in enumerate(datasets):
-        key=dict(
-            name='process_dataset',
-            batch_name=config['batch_name'],
-            study_name=ds['study'],
-            dataset_name=ds['name']
-        )
-        if acquire_lock_for_key(key=key,code=code):
-            try:
-                print('========= Processing dataset {}/{}: {}/{}'.format(i+1,len(datasets),ds['study'],ds['name']))
-                result0=sf_process_dataset(ds)
-            except:
-                pa.set(key=key,value='error-'+code)
-                raise
-            if check_consistent_code(key=key,code=code):
-                kb.saveObject(key=key,object=result0)
-            else:
-                print('Warning: inconsistent code for {}'.format(json.dumps(key)))
-                
         for sorter in sorters:
             key=dict(
                 name='sort_dataset',
@@ -100,22 +82,13 @@ def sf_batch_assemble(config):
     sorters=config['sorters']
     
     batch_output=dict(
-        datasets=[],
+        datasets=datasets,
+        sorters=sorters,
         sorting_results=[]
     )
     for ds in datasets:
-        print('ASSEMBLE: {}/{}'.format(ds['study'],ds['name']))
-        key=dict(
-            name='process_dataset',
-            batch_name=config['batch_name'],
-            study_name=ds['study'],
-            dataset_name=ds['name']
-        )
-        result0=kb.loadObject(key=key)
-        if not result0:
-            raise Exception('Problem loading result {}'.format(json.dumps(key)))
-        batch_output['datasets'].append(result0)
         for sorter in sorters:
+            print('ASSEMBLE: {} {}/{}'.format(sorter['name'],ds['study'],ds['name']))
             key=dict(
                 name='sort_dataset',
                 batch_name=config['batch_name'],
