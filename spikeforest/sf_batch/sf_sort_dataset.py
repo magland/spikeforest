@@ -113,14 +113,18 @@ def sf_sort_dataset(sorter,dataset):
         firings_out=dict(ext='.mda'),
         **sorting_params
     ).outputs
+    firings_out=kb.saveFile(outputs['firings_out'])
     result=dict(
         dataset_name=dataset['name'],
+        study_name=dataset['study'],
         dataset_dir=dsdir,
         firings_true=dsdir+'/firings_true.mda',
         sorting_params=sorting_params,
         sorting_processor_name=SS.NAME,
         sorting_processor_version=SS.VERSION,
-        firings=outputs['firings_out']
+        firings=firings_out
     )
-    kb.saveFile(outputs['firings_out'])
+    result['summary']=sf.summarizeSorting(result)
+    result['comparison_with_truth']=sf.compareWithTruth(result)
+    
     return result

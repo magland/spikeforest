@@ -1,5 +1,5 @@
 {
-    "batch_name":"test1",
+    "batch_name":"sample1",
     "share_id":"spikeforest.spikeforest1",
 	"studies":["magland_synth_noise10_K10_C4"],
 	"datasets":["001_synth"],
