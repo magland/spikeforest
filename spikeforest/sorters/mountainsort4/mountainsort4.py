@@ -1,5 +1,6 @@
 import spiketoolkit as st
 import time
+import spikewidgets as sw
 
 def mountainsort4(
         recording, # The recording extractor
@@ -26,11 +27,11 @@ def mountainsort4(
 
     # Bandpass filter
     if freq_min is not None:
-        recording=st.filters.bandpass_filter(recording=recording, freq_min=freq_min, freq_max=freq_max)
+        recording=sw.lazyfilters.bandpass_filter(recording=recording, freq_min=freq_min, freq_max=freq_max)
 
     # Whiten
     if whiten:
-        recording=st.filters.whiten(recording=recording)
+        recording=sw.lazyfilters.whiten(recording=recording)
 
     # Sort
     sorting=ml_ms4alg.mountainsort4(
