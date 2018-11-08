@@ -25,7 +25,8 @@ class MountainSort4(mlpr.Processor):
     
     def run(self):
         recording=si.MdaRecordingExtractor(self.dataset_dir)
-        num_workers=os.environ.get('NUM_WORKERS',None)
+        num_workers=int(os.environ.get('NUM_WORKERS',-1))
+        if num_workers<=0: num_workers=None
         sorting=sf.sorters.mountainsort4(
             recording=recording,
             detect_sign=self.detect_sign,
