@@ -11,7 +11,7 @@ def read_json_file(fname):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = 'Sort the SpikeForest datasets')
-    parser.add_argument('command',help='prepare, run, assemble')
+    parser.add_argument('command',help='clear, prepare, run, assemble')
     parser.add_argument('config_file',help='Name of config .json file')
     args = parser.parse_args()
 
@@ -23,7 +23,9 @@ if __name__ == '__main__':
     config_fname=args.config_file
     
     config=read_json_file(config_fname)
-    if command=='prepare':
+    if command=='clear':
+      sf.sf_batch.sf_batch_prepare(config,clear_all=True)
+    elif command=='prepare':
       sf.sf_batch.sf_batch_prepare(config)
     elif command=='run':
       sf.sf_batch.sf_batch_run(config)
