@@ -111,6 +111,7 @@ def sf_batch_assemble(config):
     )
     for ds in recordings:
         if config.get('summarize_recordings',None):
+            print('ASSEMBLE: {}/{}'.format(ds['study'],ds['name']))
             key=dict(
                 name='summarize_recording',
                 batch_name=config['batch_name'],
@@ -139,7 +140,7 @@ def sf_batch_assemble(config):
             
     kb.saveObject(
         key=dict(
-            batch_name=config['batch_name'],
+            batch_name=config['name'],
         ),
         object=batch_output
     )
