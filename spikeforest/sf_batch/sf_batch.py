@@ -16,7 +16,7 @@ def login(config):
 
 def sf_batch_prepare(config,*,clear_all=False):
     login(config)
-    study_obj=kb.loadObject(key=dict(name='spikeforest_studies'))
+    study_obj=kb.loadObject(key=dict(name='spikeforest_recordings'))
     recordings=select_recordings(study_obj,config)
     sorters=config['sorters']
     
@@ -49,7 +49,7 @@ def sf_batch_prepare(config,*,clear_all=False):
 
 def sf_batch_run(config):
     login(config)
-    study_obj=kb.loadObject(key=dict(name='spikeforest_studies'))
+    study_obj=kb.loadObject(key=dict(name='spikeforest_recordings'))
     recordings=select_recordings(study_obj,config)
     sorters=config['sorters']
     
@@ -99,7 +99,7 @@ def sf_batch_run(config):
                 
 def sf_batch_assemble(config):
     login(config)
-    study_obj=kb.loadObject(key=dict(name='spikeforest_studies'))
+    study_obj=kb.loadObject(key=dict(name='spikeforest_recordings'))
     recordings=select_recordings(study_obj,config)
     sorters=config['sorters']
     
