@@ -30,7 +30,7 @@ def sf_batch_prepare(config,*,clear_all=False):
         if config.get('summarize_recordings',None):
             key=dict(
                 name='summarize_recording',
-                batch_name=config['batch_name'],
+                batch_name=config['name'],
                 study_name=ds['study'],
                 recording_name=ds['name']
             )
@@ -39,7 +39,7 @@ def sf_batch_prepare(config,*,clear_all=False):
         for sorter in sorters:
             key=dict(
                 name='sort_recording',
-                batch_name=config['batch_name'],
+                batch_name=config['name'],
                 study_name=ds['study'],
                 recording_name=ds['name'],
                 sorter_name=sorter['name'],
@@ -58,7 +58,7 @@ def sf_batch_run(config):
         if config.get('summarize_recordings',None):
             key=dict(
                 name='summarize_recording',
-                batch_name=config['batch_name'],
+                batch_name=config['name'],
                 study_name=ds['study'],
                 recording_name=ds['name']
             )
@@ -78,7 +78,7 @@ def sf_batch_run(config):
         for sorter in sorters:
             key=dict(
                 name='sort_recording',
-                batch_name=config['batch_name'],
+                batch_name=config['name'],
                 study_name=ds['study'],
                 recording_name=ds['name'],
                 sorter_name=sorter['name'],
@@ -114,7 +114,7 @@ def sf_batch_assemble(config):
             print('ASSEMBLE: {}/{}'.format(ds['study'],ds['name']))
             key=dict(
                 name='summarize_recording',
-                batch_name=config['batch_name'],
+                batch_name=config['name'],
                 study_name=ds['study'],
                 recording_name=ds['name']
             )
@@ -127,7 +127,7 @@ def sf_batch_assemble(config):
             print('ASSEMBLE: {} {}/{}'.format(sorter['name'],ds['study'],ds['name']))
             key=dict(
                 name='sort_recording',
-                batch_name=config['batch_name'],
+                batch_name=config['name'],
                 study_name=ds['study'],
                 recording_name=ds['name'],
                 sorter_name=sorter['name'],
