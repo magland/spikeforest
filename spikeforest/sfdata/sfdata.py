@@ -60,6 +60,7 @@ class SFRecording():
         self._obj=obj
         self._sorting_result_names=[]
         self._sorting_results_by_name=dict()
+        self._summary_result=None
         self._study=study
     def getObject(self):
         return self._obj
@@ -76,10 +77,12 @@ class SFRecording():
     def sortingTrue(self):
         return si.MdaSortingExtractor(firings_file=self.directory()+'/firings_true.mda')
     def plotNames(self):
-        plots=self._obj.get('plots',dict())
+        if not self._summary_result:
+            return []
+        plots=self._summary_result.get('plots',dict())
         return list(plots.keys())
     def plot(self,name,format='image'):
-        plots=self._obj.get('plots',dict())
+        plots=self._summary_result.get('plots',dict())
         url=plots[name]
         if format=='url':
             return url
@@ -91,6 +94,8 @@ class SFRecording():
                 return path
             else:
                 raise Exception('Invalid format: '+format)
+    def setSummaryResult(self,obj):
+        self._summary_result=obj
     def addSortingResult(self,obj):
         sorter_name=obj['sorter_name']
         if sorter_name in self._sorting_results_by_name:
@@ -133,7 +138,7 @@ class SFData():
     def __init__(self):
         self._studies_by_name=dict()
         self._study_names=[]
-    def loadStudies(self,*,key=None):
+    def loadRecordings(self,*,key=None):
         if key is None:
             key=dict(name='spikeforest_studies_processed')
         obj=kb.loadObject(key=key)
@@ -150,17 +155,26 @@ class SFData():
         for ds in recordings:
             study=ds['study']
             self._studies_by_name[study].addRecording(ds)
-    def loadSortingResults(self,*,key):
+    def loadProcessingBatch(self,*,key):
         obj=kb.loadObject(key=key)
-        results=obj['sorting_results']
-        for result in results:
+        sorting_results=obj['sorting_results']
+        for result in sorting_results:
             study_name=result['study_name']
             recording_name=result['recording_name']
             sorter_name=result['sorter_name']
             S=self.study(study_name)
             D=S.recording(recording_name)
             D.addSortingResult(result)
-        print('Loaded {} results'.format(len(results)))
+
+        summarize_recording_results=obj['summarize_recording_results']
+        for result in summarize_recording_results:
+            study_name=result['study']
+            recording_name=result['name']
+            S=self.study(study_name)
+            D=S.recording(recording_name)
+            D.setSummaryResult(result)
+        print('Loaded {} sorting results and {} summarize_recording results'.format(len(sorting_results),len(summarize_recording_results)))
+
     def studyNames(self):
         return self._study_names
     def study(self,name):
