@@ -27,13 +27,14 @@ def sf_batch_prepare(config,*,clear_all=False):
         dsdir=ds['directory']
         kb.realizeFile(dsdir+'/raw.mda')
         
-        key=dict(
-            name='summarize_recording',
-            batch_name=config['batch_name'],
-            study_name=ds['study'],
-            recording_name=ds['name']
-        )
-        clear_result_for_key(key=key,in_process_only=clear_in_process_only)
+        if config.get('summarize_recordings',None):
+            key=dict(
+                name='summarize_recording',
+                batch_name=config['batch_name'],
+                study_name=ds['study'],
+                recording_name=ds['name']
+            )
+            clear_result_for_key(key=key,in_process_only=clear_in_process_only)
         
         for sorter in sorters:
             key=dict(
@@ -54,6 +55,26 @@ def sf_batch_run(config):
     
     code=''.join(random.choice(string.ascii_uppercase) for x in range(10))
     for i,ds in enumerate(recordings):
+        if config.get('summarize_recordings',None):
+            key=dict(
+                name='summarize_recording',
+                batch_name=config['batch_name'],
+                study_name=ds['study'],
+                recording_name=ds['name']
+            )
+            if acquire_lock_for_key(key=key,code=code):
+                try:
+                    print('========= Summarizing recording {}/{}: {}/{}'.format(i,len(recordings),ds['study'],ds['name']))
+                    result0=sf_summarize_recording(ds)
+                except:
+                    if check_consistent_code(key=key,code=code):
+                        pa.set(key=key,value='error-'+code)
+                    raise
+                if check_consistent_code(key=key,code=code):
+                    kb.saveObject(key=key,object=result0)
+                else:
+                    print('Warning: inconsistent code for {}'.format(json.dumps(key)))
+
         for sorter in sorters:
             key=dict(
                 name='sort_recording',
@@ -68,7 +89,8 @@ def sf_batch_run(config):
                     print('========= Sorting recording {}/{}: {} - {}/{}'.format(i,len(recordings),sorter['name'],ds['study'],ds['name']))
                     result0=sf_sort_recording(sorter,ds)
                 except:
-                    pa.set(key=key,value='error-'+code)
+                    if check_consistent_code(key=key,code=code):
+                        pa.set(key=key,value='error-'+code)
                     raise
                 if check_consistent_code(key=key,code=code):
                     kb.saveObject(key=key,object=result0)
@@ -84,9 +106,22 @@ def sf_batch_assemble(config):
     batch_output=dict(
         recordings=recordings,
         sorters=sorters,
+        summarize_recording_results=[],
         sorting_results=[]
     )
     for ds in recordings:
+        if config.get('summarize_recordings',None):
+            key=dict(
+                name='summarize_recording',
+                batch_name=config['batch_name'],
+                study_name=ds['study'],
+                recording_name=ds['name']
+            )
+            result0=kb.loadObject(key=key)
+            if not result0:
+                raise Exception('Problem loading summarize_recording result {}'.format(json.dumps(key)))
+            batch_output['summarize_recording_results'].append(result0)
+
         for sorter in sorters:
             print('ASSEMBLE: {} {}/{}'.format(sorter['name'],ds['study'],ds['name']))
             key=dict(
@@ -99,7 +134,7 @@ def sf_batch_assemble(config):
             )
             result0=kb.loadObject(key=key)
             if not result0:
-                raise Exception('Problem loading result {}'.format(json.dumps(key)))
+                raise Exception('Problem loading sort_recording result {}'.format(json.dumps(key)))
             batch_output['sorting_results'].append(result0)
             
     kb.saveObject(
