@@ -11,7 +11,7 @@ class MountainSort4(mlpr.Processor):
     NAME='MountainSort4'
     VERSION='4.0.1'
     
-    dataset_dir=mlpr.Input('Directory of dataset',directory=True)
+    recording_dir=mlpr.Input('Directory of recording',directory=True)
     firings_out=mlpr.Output('Output firings file')
     
     detect_sign=mlpr.IntegerParameter('Use -1, 0, or 1, depending on the sign of the spikes in the recording')
@@ -25,7 +25,7 @@ class MountainSort4(mlpr.Processor):
     noise_overlap_threshold=mlpr.FloatParameter(optional=True,default=0.15,description='Use None for no automated curation')
     
     def run(self):
-        recording=si.MdaRecordingExtractor(self.dataset_dir)
+        recording=si.MdaRecordingExtractor(self.recording_dir)
         num_workers=os.environ.get('NUM_WORKERS',None)
         if num_workers:
             num_workers=int(num_workers)
@@ -49,7 +49,7 @@ class IronClust(mlpr.Processor):
     NAME='IronClust'
     VERSION='4.2.6'
     
-    dataset_dir=mlpr.Input('Directory of dataset',directory=True)
+    recording_dir=mlpr.Input('Directory of recording',directory=True)
     firings_out=mlpr.Output('Output firings file')
     
     detect_sign=mlpr.IntegerParameter('Use -1, 0, or 1, depending on the sign of the spikes in the recording')
@@ -69,7 +69,7 @@ class IronClust(mlpr.Processor):
         tmpdir=os.environ.get('TEMPDIR','/tmp')+'/ironclust-tmp-'+code
             
         try:
-            recording=si.MdaRecordingExtractor(self.dataset_dir)
+            recording=si.MdaRecordingExtractor(self.recording_dir)
             if not os.path.exists(tmpdir):
                 os.mkdir(tmpdir)
             sorting=sf.sorters.ironclust(
@@ -99,8 +99,8 @@ Processors=dict(
     IronClust=IronClust
 )
         
-def sf_sort_dataset(sorter,dataset):
-    dsdir=dataset['directory']
+def sf_sort_recording(sorter,recording):
+    dsdir=recording['directory']
     sorting_params=sorter['params']
     processor_name=sorter['processor_name']
     if processor_name in Processors:
@@ -109,16 +109,16 @@ def sf_sort_dataset(sorter,dataset):
         raise Exception('No such sorter: '+processor_name)
         
     outputs=SS.execute(
-        dataset_dir=dsdir,
+        recording_dir=dsdir,
         firings_out=dict(ext='.mda'),
         **sorting_params
     ).outputs
     firings_out=kb.saveFile(outputs['firings_out'])
     result=dict(
-        dataset_name=dataset['name'],
-        study_name=dataset['study'],
+        recording_name=recording['name'],
+        study_name=recording['study'],
         sorter_name=sorter['name'],
-        dataset_dir=dsdir,
+        recording_dir=dsdir,
         firings_true=dsdir+'/firings_true.mda',
         sorting_params=sorting_params,
         sorting_processor_name=SS.NAME,

@@ -10,7 +10,7 @@ def read_json_file(fname):
         return json.load(f)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'Sort the SpikeForest datasets')
+    parser = argparse.ArgumentParser(description = 'Sort the SpikeForest recordings')
     parser.add_argument('command',help='clear, prepare, run, assemble')
     parser.add_argument('config_file',help='Name of config .json file')
     args = parser.parse_args()

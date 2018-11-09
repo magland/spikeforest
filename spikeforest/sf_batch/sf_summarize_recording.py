@@ -10,17 +10,17 @@ from pairio import client as pa
 import mlprocessors as mlpr
 from matplotlib import pyplot as plt
 
-def sf_process_dataset(dataset):
-  ret=deepcopy(dataset)
-  ret['computed_info']=compute_dataset_info(dataset)  
-  firings_true_path=dataset['directory']+'/firings_true.mda'
+def sf_summarize_recording(recording):
+  ret=deepcopy(recording)
+  ret['computed_info']=compute_recording_info(recording)  
+  firings_true_path=recording['directory']+'/firings_true.mda'
   if kb.findFile(firings_true_path):
     ret['ground_truth']=firings_true_path
   ret['plots']=dict(
-    timeseries=create_timeseries_plot(dataset)
+    timeseries=create_timeseries_plot(recording)
   )
   if ret['ground_truth']:
-    ret['plots']['waveforms_true']=create_waveforms_plot(dataset,ret['ground_truth'])
+    ret['plots']['waveforms_true']=create_waveforms_plot(recording,ret['ground_truth'])
   return ret
 
 def read_json_file(fname):
@@ -38,9 +38,9 @@ def save_plot(fname,quality=40):
     os.remove(fname+'.png')
     im.save(fname,quality=quality)
 
-# A MountainLab processor for generating the summary info for a dataset
-class ComputeDatasetInfo(mlpr.Processor):
-  NAME='ComputeDatasetInfo'
+# A MountainLab processor for generating the summary info for a recording
+class ComputeRecordingInfo(mlpr.Processor):
+  NAME='ComputeRecordingInfo'
   VERSION='0.1.0'
   recording_dir=mlpr.Input(directory=True,description='Recording directory')
   json_out=mlpr.Output('Info in .json file')
@@ -53,8 +53,8 @@ class ComputeDatasetInfo(mlpr.Processor):
     ret['duration_sec']=recording.getNumFrames()/ret['samplerate']
     write_json_file(self.json_out,ret)
   
-def compute_dataset_info(dataset):
-  out=ComputeDatasetInfo.execute(recording_dir=dataset['directory'],json_out={'ext':'.json'}).outputs['json_out']
+def compute_recording_info(recording):
+  out=ComputeRecordingInfo.execute(recording_dir=recording['directory'],json_out={'ext':'.json'}).outputs['json_out']
   kb.saveFile(out)
   return read_json_file(kb.realizeFile(out))
 
@@ -75,8 +75,8 @@ class CreateTimeseriesPlot(mlpr.Processor):
     sw.TimeseriesWidget(recording=R,trange=[N2-4000,N2+0],channels=channels,width=12,height=5).plot()
     save_plot(self.jpg_out)
     
-def create_timeseries_plot(dataset):
-  out=CreateTimeseriesPlot.execute(recording_dir=dataset['directory'],jpg_out={'ext':'.jpg'}).outputs['jpg_out']
+def create_timeseries_plot(recording):
+  out=CreateTimeseriesPlot.execute(recording_dir=recording['directory'],jpg_out={'ext':'.jpg'}).outputs['jpg_out']
   kb.saveFile(out)
   return 'sha1://'+kb.computeFileSha1(out)+'/timeseries.jpg'
 
@@ -101,8 +101,8 @@ class CreateWaveformsPlot(mlpr.Processor):
     sw.UnitWaveformsWidget(recording=R,sorting=S,channels=channels,unit_ids=units).plot()
     save_plot(self.jpg_out)
     
-def create_waveforms_plot(dataset,firings):
-  out=CreateWaveformsPlot.execute(recording_dir=dataset['directory'],firings=firings,jpg_out={'ext':'.jpg'}).outputs['jpg_out']
+def create_waveforms_plot(recording,firings):
+  out=CreateWaveformsPlot.execute(recording_dir=recording['directory'],firings=firings,jpg_out={'ext':'.jpg'}).outputs['jpg_out']
   kb.saveFile(out)
   return 'sha1://'+kb.computeFileSha1(out)+'/waveforms.jpg'
 

@@ -5,8 +5,8 @@ import json
 import os
 import random
 import string
-from .sf_process_dataset import sf_process_dataset
-from .sf_sort_dataset import sf_sort_dataset
+from .sf_summarize_recording import sf_summarize_recording
+from .sf_sort_recording import sf_sort_recording
 
 def login(config):
     password=os.environ.get('SPIKEFOREST_PASSWORD',None)
@@ -17,30 +17,30 @@ def login(config):
 def sf_batch_prepare(config,*,clear_all=False):
     login(config)
     study_obj=kb.loadObject(key=dict(name='spikeforest_studies'))
-    datasets=select_datasets(study_obj,config)
+    recordings=select_recordings(study_obj,config)
     sorters=config['sorters']
     
     clear_in_process_only=(not clear_all)
-    for ds in datasets:
+    for ds in recordings:
         print('PREPARE: {}/{}'.format(ds['study'],ds['name']))
         print('Downloading raw.mda')
         dsdir=ds['directory']
         kb.realizeFile(dsdir+'/raw.mda')
         
         key=dict(
-            name='process_dataset',
+            name='summarize_recording',
             batch_name=config['batch_name'],
             study_name=ds['study'],
-            dataset_name=ds['name']
+            recording_name=ds['name']
         )
         clear_result_for_key(key=key,in_process_only=clear_in_process_only)
         
         for sorter in sorters:
             key=dict(
-                name='sort_dataset',
+                name='sort_recording',
                 batch_name=config['batch_name'],
                 study_name=ds['study'],
-                dataset_name=ds['name'],
+                recording_name=ds['name'],
                 sorter_name=sorter['name'],
                 sorter_params=sorter['params']
             )
@@ -49,24 +49,24 @@ def sf_batch_prepare(config,*,clear_all=False):
 def sf_batch_run(config):
     login(config)
     study_obj=kb.loadObject(key=dict(name='spikeforest_studies'))
-    datasets=select_datasets(study_obj,config)
+    recordings=select_recordings(study_obj,config)
     sorters=config['sorters']
     
     code=''.join(random.choice(string.ascii_uppercase) for x in range(10))
-    for i,ds in enumerate(datasets):
+    for i,ds in enumerate(recordings):
         for sorter in sorters:
             key=dict(
-                name='sort_dataset',
+                name='sort_recording',
                 batch_name=config['batch_name'],
                 study_name=ds['study'],
-                dataset_name=ds['name'],
+                recording_name=ds['name'],
                 sorter_name=sorter['name'],
                 sorter_params=sorter['params']
             )
             if acquire_lock_for_key(key=key,code=code):
                 try:
-                    print('========= Sorting dataset {}/{}: {} - {}/{}'.format(i,len(datasets),sorter['name'],ds['study'],ds['name']))
-                    result0=sf_sort_dataset(sorter,ds)
+                    print('========= Sorting recording {}/{}: {} - {}/{}'.format(i,len(recordings),sorter['name'],ds['study'],ds['name']))
+                    result0=sf_sort_recording(sorter,ds)
                 except:
                     pa.set(key=key,value='error-'+code)
                     raise
@@ -78,22 +78,22 @@ def sf_batch_run(config):
 def sf_batch_assemble(config):
     login(config)
     study_obj=kb.loadObject(key=dict(name='spikeforest_studies'))
-    datasets=select_datasets(study_obj,config)
+    recordings=select_recordings(study_obj,config)
     sorters=config['sorters']
     
     batch_output=dict(
-        datasets=datasets,
+        recordings=recordings,
         sorters=sorters,
         sorting_results=[]
     )
-    for ds in datasets:
+    for ds in recordings:
         for sorter in sorters:
             print('ASSEMBLE: {} {}/{}'.format(sorter['name'],ds['study'],ds['name']))
             key=dict(
-                name='sort_dataset',
+                name='sort_recording',
                 batch_name=config['batch_name'],
                 study_name=ds['study'],
-                dataset_name=ds['name'],
+                recording_name=ds['name'],
                 sorter_name=sorter['name'],
                 sorter_params=sorter['params']
             )
@@ -110,13 +110,13 @@ def sf_batch_assemble(config):
     )
 
 
-def select_datasets(study_obj,config):
-    datasets=[]
-    for ds in study_obj['datasets']:
+def select_recordings(study_obj,config):
+    recordings=[]
+    for ds in study_obj['recordings']:
         if ds['study'] in config['studies']:
-            if (not config['datasets']) or (ds['name'] in config['datasets']):
-                datasets.append(ds)
-    return datasets
+            if (not config['recordings']) or (ds['name'] in config['recordings']):
+                recordings.append(ds)
+    return recordings
 
 def clear_result_for_key(*,key,in_process_only=False):
     val=pa.get(key=key)

@@ -15,13 +15,13 @@ def kb_read_json_file(fname):
         return json.load(f)
 
 class SFSortingResult():
-    def __init__(self,obj,dataset):
+    def __init__(self,obj,recording):
         self._obj=obj
-        self._dataset=dataset
+        self._recording=recording
     def getObject(self):
         return self._obj
-    def dataset(self):
-        return self._dataset
+    def recording(self):
+        return self._recording
     def sorterName(self):
         return self._obj['sorter_name']
     def plotNames(self):
@@ -55,7 +55,7 @@ class SFSortingResult():
             else:
                 raise Exception('Invalid format: '+format)
 
-class SFDataset():
+class SFRecording():
     def __init__(self,obj,study):
         self._obj=obj
         self._sorting_result_names=[]
@@ -94,7 +94,7 @@ class SFDataset():
     def addSortingResult(self,obj):
         sorter_name=obj['sorter_name']
         if sorter_name in self._sorting_results_by_name:
-            print('Sorting result already in dataset: {}'.format(sorter_name))
+            print('Sorting result already in recording: {}'.format(sorter_name))
         else:
             R=SFSortingResult(obj,self)
             self._sorting_result_names.append(sorter_name)
@@ -107,26 +107,26 @@ class SFDataset():
 class SFStudy():
     def __init__(self,obj):
         self._obj=obj
-        self._datasets_by_name=dict()
-        self._dataset_names=[]
+        self._recordings_by_name=dict()
+        self._recording_names=[]
     def getObject(self):
         return self._obj
     def name(self):
         return self._obj['name']
     def description(self):
         return self._obj['description']
-    def addDataset(self,obj):
+    def addRecording(self,obj):
         name=obj['name']
-        if name in self._datasets_by_name:
-            print('Dataset already in study: '+name)
+        if name in self._recordings_by_name:
+            print('Recording already in study: '+name)
         else:
-            self._dataset_names.append(name)
-            D=SFDataset(obj,self)
-            self._datasets_by_name[name]=D
-    def datasetNames(self):
-        return self._dataset_names
-    def dataset(self,name):
-        return self._datasets_by_name[name]
+            self._recording_names.append(name)
+            D=SFRecording(obj,self)
+            self._recordings_by_name[name]=D
+    def recordingNames(self):
+        return self._recording_names
+    def recording(self,name):
+        return self._recordings_by_name[name]
         
 
 class SFData():
@@ -146,19 +146,19 @@ class SFData():
                 self._study_names.append(study['name'])
                 S=SFStudy(study)
                 self._studies_by_name[name]=S
-        datasets=obj['datasets']
-        for ds in datasets:
+        recordings=obj['recordings']
+        for ds in recordings:
             study=ds['study']
-            self._studies_by_name[study].addDataset(ds)
+            self._studies_by_name[study].addRecording(ds)
     def loadSortingResults(self,*,key):
         obj=kb.loadObject(key=key)
         results=obj['sorting_results']
         for result in results:
             study_name=result['study_name']
-            dataset_name=result['dataset_name']
+            recording_name=result['recording_name']
             sorter_name=result['sorter_name']
             S=self.study(study_name)
-            D=S.dataset(dataset_name)
+            D=S.recording(recording_name)
             D.addSortingResult(result)
         print('Loaded {} results'.format(len(results)))
     def studyNames(self):
