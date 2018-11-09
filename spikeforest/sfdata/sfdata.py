@@ -64,6 +64,8 @@ class SFRecording():
         self._study=study
     def getObject(self):
         return self._obj
+    def getSummaryObject(self):
+        return self._summary_result
     def study(self):
         return self._study
     def name(self):
@@ -94,6 +96,14 @@ class SFRecording():
                 return path
             else:
                 raise Exception('Invalid format: '+format)
+    def trueUnitsInfo(self,format='dataframe'):
+        B=kb_read_json_file(self._summary_result['true_units_info'])
+        if format=='json':
+            return B
+        elif format=='dataframe':
+            return pd.DataFrame(B)
+        else:
+            raise Exception('Invalid format: '+format)
     def setSummaryResult(self,obj):
         self._summary_result=obj
     def addSortingResult(self,obj):

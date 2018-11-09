@@ -139,7 +139,7 @@ def sf_batch_assemble(config):
             
     kb.saveObject(
         key=dict(
-            batch_name=config['batch_name']
+            batch_name=config['batch_name'],
         ),
         object=batch_output
     )

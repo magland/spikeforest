@@ -8,9 +8,9 @@ export MKL_NUM_THREADS=$NUM_WORKERS
 export NUMEXPR_NUM_THREADS=$NUM_WORKERS
 export OMP_NUM_THREADS=$NUM_WORKERS
 
-config=$1
+batch_name=$1
 
-python driver_sf_batch.py prepare $config
-$parellel_prefix python driver_sf_batch.py run $config
-#srun -c 2 -n 40 python driver_sf_batch.py run $config
-python driver_sf_batch.py assemble $config
+python driver_sf_batch.py prepare $batch_name
+python driver_sf_batch.py run $batch_name
+# srun -c 2 -n 80 -p ccb --qos=ccb python driver_sf_batch.py run $batch_name
+python driver_sf_batch.py assemble $batch_name
