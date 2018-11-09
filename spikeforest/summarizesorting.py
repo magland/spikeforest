@@ -8,11 +8,11 @@ import os
 
 def summarizeSorting(result):
     ret={'plots':{}}
-    unit_waveforms=PlotUnitWaveforms.execute(recording_dir=result['dataset_dir'],firings=result['firings'],plot_out={'ext':'.jpg'}).outputs['plot_out']
+    unit_waveforms=PlotUnitWaveforms.execute(recording_dir=result['recording_dir'],firings=result['firings'],plot_out={'ext':'.jpg'}).outputs['plot_out']
     unit_waveforms=kb.saveFile(unit_waveforms,basename='unit_waveforms.jpg')
     ret['plots']['unit_waveforms']=unit_waveforms
 
-    autocorrelograms=PlotAutoCorrelograms.execute(recording_dir=result['dataset_dir'],firings=result['firings'],plot_out={'ext':'.jpg'}).outputs['plot_out']
+    autocorrelograms=PlotAutoCorrelograms.execute(recording_dir=result['recording_dir'],firings=result['firings'],plot_out={'ext':'.jpg'}).outputs['plot_out']
     autocorrelograms=kb.saveFile(autocorrelograms,basename='autocorrelograms.jpg')
     ret['plots']['autocorrelograms']=autocorrelograms
 
