@@ -148,7 +148,7 @@ def sf_batch_assemble(config):
 def select_recordings(study_obj,config):
     recordings=[]
     for ds in study_obj['recordings']:
-        if ds['study'] in config['studies']:
+        if (not config['studies']) or (ds['study'] in config['studies']):
             if (not config['recordings']) or (ds['name'] in config['recordings']):
                 recordings.append(ds)
     return recordings
