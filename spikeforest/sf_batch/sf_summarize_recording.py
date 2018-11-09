@@ -21,7 +21,7 @@ def sf_summarize_recording(recording):
   ret['plots']=dict(
     timeseries=create_timeseries_plot(recording)
   )
-  if ret['firings_true']:
+  if 'firings_true' in ret:
     ret['plots']['waveforms_true']=create_waveforms_plot(recording,ret['firings_true'])
     ret['true_units_info']=compute_true_units_info(recording,ret['firings_true'])
   return ret
