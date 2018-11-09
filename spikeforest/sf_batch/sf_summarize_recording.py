@@ -9,18 +9,21 @@ from kbucket import client as kb
 from pairio import client as pa
 import mlprocessors as mlpr
 from matplotlib import pyplot as plt
+import json
+from .compute_unit_snrs import compute_unit_snrs
 
 def sf_summarize_recording(recording):
   ret=deepcopy(recording)
   ret['computed_info']=compute_recording_info(recording)  
   firings_true_path=recording['directory']+'/firings_true.mda'
   if kb.findFile(firings_true_path):
-    ret['ground_truth']=firings_true_path
+    ret['firings_true']=firings_true_path
   ret['plots']=dict(
     timeseries=create_timeseries_plot(recording)
   )
-  if ret['ground_truth']:
-    ret['plots']['waveforms_true']=create_waveforms_plot(recording,ret['ground_truth'])
+  if ret['firings_true']:
+    ret['plots']['waveforms_true']=create_waveforms_plot(recording,ret['firings_true'])
+    ret['true_units_info']=compute_true_units_info(recording,ret['firings_true'])
   return ret
 
 def read_json_file(fname):
@@ -106,3 +109,32 @@ def create_waveforms_plot(recording,firings):
   kb.saveFile(out)
   return 'sha1://'+kb.computeFileSha1(out)+'/waveforms.jpg'
 
+class ComputeTrueUnitsInfo(mlpr.Processor):
+  NAME='ComputeTrueUnitsInfo'
+  VERSION='0.1.0'
+  recording_dir=mlpr.Input(directory=True,description='Recording directory')
+  firings=mlpr.Input(description='Firings file')
+  json_out=mlpr.Output('The info as a .json file')
+  
+  def run(self):
+    R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=True)
+    R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
+    S=si.MdaSortingExtractor(firings_file=self.firings)
+    units=S.getUnitIds()
+    ret=[]
+    snrs=compute_unit_snrs(recording=R,sorting=S)
+    for u in units:
+      info=dict()
+      info['unit']=int(u)
+      train=S.getUnitSpikeTrain(unit_id=u)
+      info['num_events']=len(train)
+      info['firing_rate']=len(train)/(R.getNumFrames()/R.getSamplingFrequency())
+      info['snr']=snrs[u]
+      ## TODO: peak channel
+      ret.append(info)
+    write_json_file(self.json_out,ret)
+
+def compute_true_units_info(recording,firings):
+  out=ComputeTrueUnitsInfo.execute(recording_dir=recording['directory'],firings=firings,json_out={'ext':'.json'}).outputs['json_out']
+  kb.saveFile(out)
+  return 'sha1://'+kb.computeFileSha1(out)+'/true_units_info.json'
