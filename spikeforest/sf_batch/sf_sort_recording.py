@@ -119,13 +119,14 @@ def sf_sort_recording(sorter,recording):
         study_name=recording['study'],
         sorter_name=sorter['name'],
         recording_dir=dsdir,
-        firings_true=dsdir+'/firings_true.mda',
+        firings_true=recording.get('firings_true',None),
         sorting_params=sorting_params,
         sorting_processor_name=SS.NAME,
         sorting_processor_version=SS.VERSION,
         firings=firings_out
     )
     result['summary']=sf.summarizeSorting(result)
-    result['comparison_with_truth']=sf.compareWithTruth(result)
+    if result.get('firings_true',None):
+        result['comparison_with_truth']=sf.compareWithTruth(result)
     
     return result
