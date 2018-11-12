@@ -1,5 +1,4 @@
 import spikeinterface as si
-import spiketoolkit as st
 import spikewidgets as sw
 import json
 from PIL import Image
@@ -80,7 +79,7 @@ class CreateTimeseriesPlot(mlpr.Processor):
     R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=False)
     if len(self.channels)>0:
       R0=si.SubRecordingExtractor(parent_recording=R0,channel_ids=self.channels)
-    R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
+    R=sw.lazyfilters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     N=R.getNumFrames()
     N2=int(N/2)
     channels=R.getChannelIds()
@@ -110,7 +109,7 @@ class CreateWaveformsPlot(mlpr.Processor):
     R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=True)
     if len(self.channels)>0:
       R0=si.SubRecordingExtractor(parent_recording=R0,channel_ids=self.channels)
-    R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
+    R=sw.lazyfilters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     S=si.MdaSortingExtractor(firings_file=self.firings)
     channels=R.getChannelIds()
     if len(channels)>20:
@@ -143,7 +142,7 @@ class ComputeTrueUnitsInfo(mlpr.Processor):
     R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=True)
     if len(self.channels)>0:
       R0=si.SubRecordingExtractor(parent_recording=R0,channel_ids=self.channels)
-    R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
+    R=sw.lazyfilters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     S=si.MdaSortingExtractor(firings_file=self.firings)
     units=S.getUnitIds()
     ret=[]
