@@ -126,6 +126,7 @@ def sf_sort_recording(sorter,recording):
         study_name=recording['study'],
         sorter_name=sorter['name'],
         recording_dir=dsdir,
+        channels=recording.get('channels',[]),
         firings_true=recording.get('firings_true',None),
         sorting_params=sorting_params,
         sorting_processor_name=SS.NAME,
