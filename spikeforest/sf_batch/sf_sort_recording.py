@@ -97,12 +97,65 @@ class IronClust(mlpr.Processor):
                 shutil.rmtree(tmpdir)
             raise
         shutil.rmtree(tmpdir)
+        
+class SpykingCircus(mlpr.Processor):
+    NAME='SpykingCircus'
+    VERSION='0.1.0'
+    
+    recording_dir=mlpr.Input('Directory of recording',directory=True)
+    channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
+    firings_out=mlpr.Output('Output firings file')
+    
+    detect_sign=mlpr.StringParameter(description='negative, positive, or both')
+    adjacency_radius=mlpr.FloatParameter(optional=True,default=100,description='Channel neighborhood adjacency radius corresponding to geom file')
+    spike_thresh=mlpr.FloatParameter(optional=True,default=6,description='Threshold for detection')
+    template_width_ms=mlpr.FloatParameter(optional=True,default=3,description='Spyking circus parameter')
+    filter=mlpr.BoolParameter(optional=True,default=True)
+    merge_spikes=mlpr.BoolParameter(optional=True,default=True)
+    whitening_max_elts=mlpr.IntegerParameter(optional=True,default=1000,description='I believe it relates to subsampling and affects compute time')
+    clustering_max_elts=mlpr.IntegerParameter(optional=True,default=10000,description='I believe it relates to subsampling and affects compute time')
+    
+    def run(self):
+        code=''.join(random.choice(string.ascii_uppercase) for x in range(10))
+        tmpdir=os.environ.get('TEMPDIR','/tmp')+'/ironclust-tmp-'+code
+        
+        num_workers=os.environ.get('NUM_WORKERS',2)
+            
+        try:
+            recording=si.MdaRecordingExtractor(self.recording_dir)
+            if len(self.channels)>0:
+              recording=si.SubRecordingExtractor(parent_recording=recording,channel_ids=self.channels)
+            if not os.path.exists(tmpdir):
+                os.mkdir(tmpdir)
+            sorting=sf.sorters.spyking_circus(
+                recording=recording,
+                output_folder=tmpdir,
+                probe_file=None,
+                file_name=None,
+                detect_sign=self.detect_sign,
+                adjacency_radius=self.adjacency_radius,
+                spike_thresh=self.spike_thresh,
+                template_width_ms=self.template_width_ms,
+                filter=self.filter,
+                merge_spikes=self.merge_spikes,
+                n_cores=num_workers,
+                electrode_dimensions=None,
+                whitening_max_elts=self.whitening_max_elts,
+                clustering_max_elts=self.clustering_max_elts
+            )
+            si.MdaSortingExtractor.writeSorting(sorting=sorting,save_path=self.firings_out)
+        except:
+            if os.path.exists(tmpdir):
+                shutil.rmtree(tmpdir)
+            raise
+        shutil.rmtree(tmpdir)
 
 #sf.sorters.ironclust(*, recording, tmpdir, detect_sign=-1, adjacency_radius=-1, detect_threshold=5, merge_thresh=0.98, freq_min=300, freq_max=6000, pc_per_chan=3, prm_template_name, ironclust_src=None)
         
 Processors=dict(
     MountainSort4=MountainSort4,
-    IronClust=IronClust
+    IronClust=IronClust,
+    SpykingCircus=SpykingCircus
 )
         
 def sf_sort_recording(sorter,recording):
