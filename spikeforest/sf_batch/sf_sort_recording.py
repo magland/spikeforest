@@ -12,6 +12,7 @@ class MountainSort4(mlpr.Processor):
     VERSION='4.0.1'
     
     recording_dir=mlpr.Input('Directory of recording',directory=True)
+    channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
     firings_out=mlpr.Output('Output firings file')
     
     detect_sign=mlpr.IntegerParameter('Use -1, 0, or 1, depending on the sign of the spikes in the recording')
@@ -26,6 +27,8 @@ class MountainSort4(mlpr.Processor):
     
     def run(self):
         recording=si.MdaRecordingExtractor(self.recording_dir)
+        if len(self.channels)>0:
+          recording=si.SubRecordingExtractor(parent_recording=recording,channel_ids=self.channels)
         num_workers=os.environ.get('NUM_WORKERS',None)
         if num_workers:
             num_workers=int(num_workers)
@@ -50,6 +53,7 @@ class IronClust(mlpr.Processor):
     VERSION='4.2.6'
     
     recording_dir=mlpr.Input('Directory of recording',directory=True)
+    channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
     firings_out=mlpr.Output('Output firings file')
     
     detect_sign=mlpr.IntegerParameter('Use -1, 0, or 1, depending on the sign of the spikes in the recording')
@@ -70,6 +74,8 @@ class IronClust(mlpr.Processor):
             
         try:
             recording=si.MdaRecordingExtractor(self.recording_dir)
+            if len(self.channels)>0:
+              recording=si.SubRecordingExtractor(parent_recording=recording,channel_ids=self.channels)
             if not os.path.exists(tmpdir):
                 os.mkdir(tmpdir)
             sorting=sf.sorters.ironclust(
@@ -110,6 +116,7 @@ def sf_sort_recording(sorter,recording):
         
     outputs=SS.execute(
         recording_dir=dsdir,
+        channels=recording.get('channels',[]),
         firings_out=dict(ext='.mda'),
         **sorting_params
     ).outputs

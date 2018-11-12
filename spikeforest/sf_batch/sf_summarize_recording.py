@@ -46,18 +46,25 @@ class ComputeRecordingInfo(mlpr.Processor):
   NAME='ComputeRecordingInfo'
   VERSION='0.1.0'
   recording_dir=mlpr.Input(directory=True,description='Recording directory')
+  channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
   json_out=mlpr.Output('Info in .json file')
     
   def run(self):
     ret={}
     recording=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=False)
+    if len(self.channels)>0:
+      recording=si.SubRecordingExtractor(parent_recording=recording,channel_ids=self.channels)
     ret['samplerate']=recording.getSamplingFrequency()
     ret['num_channels']=len(recording.getChannelIds())
     ret['duration_sec']=recording.getNumFrames()/ret['samplerate']
     write_json_file(self.json_out,ret)
   
 def compute_recording_info(recording):
-  out=ComputeRecordingInfo.execute(recording_dir=recording['directory'],json_out={'ext':'.json'}).outputs['json_out']
+  out=ComputeRecordingInfo.execute(
+    recording_dir=recording['directory'],
+    channels=recording.get('channels',[]),
+    json_out={'ext':'.json'}
+  ).outputs['json_out']
   kb.saveFile(out)
   return read_json_file(kb.realizeFile(out))
 
@@ -66,10 +73,13 @@ class CreateTimeseriesPlot(mlpr.Processor):
   NAME='CreateTimeseriesPlot'
   VERSION='0.1.6'
   recording_dir=mlpr.Input(directory=True,description='Recording directory')
+  channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
   jpg_out=mlpr.Output('The plot as a .jpg file')
   
   def run(self):
     R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=False)
+    if len(self.channels)>0:
+      R0=si.SubRecordingExtractor(parent_recording=R0,channel_ids=self.channels)
     R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     N=R.getNumFrames()
     N2=int(N/2)
@@ -79,7 +89,11 @@ class CreateTimeseriesPlot(mlpr.Processor):
     save_plot(self.jpg_out)
     
 def create_timeseries_plot(recording):
-  out=CreateTimeseriesPlot.execute(recording_dir=recording['directory'],jpg_out={'ext':'.jpg'}).outputs['jpg_out']
+  out=CreateTimeseriesPlot.execute(
+    recording_dir=recording['directory'],
+    channels=recording.get('channels',[]),
+    jpg_out={'ext':'.jpg'}
+  ).outputs['jpg_out']
   kb.saveFile(out)
   return 'sha1://'+kb.computeFileSha1(out)+'/timeseries.jpg'
 
@@ -88,11 +102,14 @@ class CreateWaveformsPlot(mlpr.Processor):
   NAME='CreateWaveformsPlot'
   VERSION='0.1.0'
   recording_dir=mlpr.Input(directory=True,description='Recording directory')
+  channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
   firings=mlpr.Input(description='Firings file')
   jpg_out=mlpr.Output('The plot as a .jpg file')
   
   def run(self):
     R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=True)
+    if len(self.channels)>0:
+      R0=si.SubRecordingExtractor(parent_recording=R0,channel_ids=self.channels)
     R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     S=si.MdaSortingExtractor(firings_file=self.firings)
     channels=R.getChannelIds()
@@ -105,7 +122,12 @@ class CreateWaveformsPlot(mlpr.Processor):
     save_plot(self.jpg_out)
     
 def create_waveforms_plot(recording,firings):
-  out=CreateWaveformsPlot.execute(recording_dir=recording['directory'],firings=firings,jpg_out={'ext':'.jpg'}).outputs['jpg_out']
+  out=CreateWaveformsPlot.execute(
+    recording_dir=recording['directory'],
+    channels=recording.get('channels',[]),
+    firings=firings,
+    jpg_out={'ext':'.jpg'}
+  ).outputs['jpg_out']
   kb.saveFile(out)
   return 'sha1://'+kb.computeFileSha1(out)+'/waveforms.jpg'
 
@@ -113,11 +135,14 @@ class ComputeTrueUnitsInfo(mlpr.Processor):
   NAME='ComputeTrueUnitsInfo'
   VERSION='0.1.0'
   recording_dir=mlpr.Input(directory=True,description='Recording directory')
+  channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
   firings=mlpr.Input(description='Firings file')
   json_out=mlpr.Output('The info as a .json file')
   
   def run(self):
     R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=True)
+    if len(self.channels)>0:
+      R0=si.SubRecordingExtractor(parent_recording=R0,channel_ids=self.channels)
     R=st.filters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     S=si.MdaSortingExtractor(firings_file=self.firings)
     units=S.getUnitIds()
@@ -135,6 +160,11 @@ class ComputeTrueUnitsInfo(mlpr.Processor):
     write_json_file(self.json_out,ret)
 
 def compute_true_units_info(recording,firings):
-  out=ComputeTrueUnitsInfo.execute(recording_dir=recording['directory'],firings=firings,json_out={'ext':'.json'}).outputs['json_out']
+  out=ComputeTrueUnitsInfo.execute(
+    recording_dir=recording['directory'],
+    channels=recording.get('channels',[]),
+    firings=firings,
+    json_out={'ext':'.json'}
+  ).outputs['json_out']
   kb.saveFile(out)
   return 'sha1://'+kb.computeFileSha1(out)+'/true_units_info.json'
