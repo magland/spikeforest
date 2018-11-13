@@ -14,6 +14,7 @@ def download_recordings(*,batch_name):
   batch=kb.loadObject(key=dict(batch_name=batch_name))
   jobs=batch['jobs']
   for job in jobs:
+    print('DOWNLOADING: '+job['label'])
     dsdir=job['recording']['directory']
     kb.realizeFile(dsdir+'/raw.mda')
     
