@@ -167,23 +167,28 @@ class SFData():
             self._studies_by_name[study].addRecording(ds)
     def loadProcessingBatch(self,*,key):
         obj=kb.loadObject(key=key)
-        sorting_results=obj['sorting_results']
-        for result in sorting_results:
-            study_name=result['study_name']
-            recording_name=result['recording_name']
-            sorter_name=result['sorter_name']
-            S=self.study(study_name)
-            D=S.recording(recording_name)
-            D.addSortingResult(result)
-
-        summarize_recording_results=obj['summarize_recording_results']
-        for result in summarize_recording_results:
-            study_name=result['study']
-            recording_name=result['name']
-            S=self.study(study_name)
-            D=S.recording(recording_name)
-            D.setSummaryResult(result)
-        print('Loaded {} sorting results and {} summarize_recording results'.format(len(sorting_results),len(summarize_recording_results)))
+        job_results=obj['job_results']
+        for X in job_results:
+            if X['job']['command']=='sort_recording':
+                study_name=X['job']['recording']['study']
+                recording_name=X['job']['recording']['name']
+                sorter_name=X['job']['sorter']['name']
+                result=X['result']
+                S=self.study(study_name)
+                D=S.recording(recording_name)
+                print('Loading sorting result: '+X['job']['label'])
+                D.addSortingResult(result)
+            elif X['job']['command']=='summarize_recording':
+                study_name=X['job']['recording']['study']
+                recording_name=X['job']['recording']['name']
+                sorter_name=X['job']['sorter']['name']
+                result=X['result']
+                S=self.study(study_name)
+                D=S.recording(recording_name)
+                print('Loading summary result: '+X['job']['label'])
+                D.setSummaryResult(result)
+            else:
+                pass
 
     def studyNames(self):
         return self._study_names
