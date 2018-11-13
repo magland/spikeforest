@@ -1,6 +1,7 @@
 from kbucket import client as kb
 import spikeinterface as si
 import spikeforest as sf
+import spiketoolkit as st
 import mlprocessors as mlpr
 import os
 import shutil
@@ -106,7 +107,7 @@ class SpykingCircus(mlpr.Processor):
     channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
     firings_out=mlpr.Output('Output firings file')
     
-    detect_sign=mlpr.StringParameter(description='negative, positive, or both')
+    detect_sign=mlpr.IntegerParameter(description='-1, 1, or 0')
     adjacency_radius=mlpr.FloatParameter(optional=True,default=100,description='Channel neighborhood adjacency radius corresponding to geom file')
     spike_thresh=mlpr.FloatParameter(optional=True,default=6,description='Threshold for detection')
     template_width_ms=mlpr.FloatParameter(optional=True,default=3,description='Spyking circus parameter')
@@ -127,7 +128,7 @@ class SpykingCircus(mlpr.Processor):
               recording=si.SubRecordingExtractor(parent_recording=recording,channel_ids=self.channels)
             if not os.path.exists(tmpdir):
                 os.mkdir(tmpdir)
-            sorting=sf.sorters.spyking_circus(
+            sorting=st.sorters.spyking_circus(
                 recording=recording,
                 output_folder=tmpdir,
                 probe_file=None,
