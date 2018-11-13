@@ -168,6 +168,8 @@ class SFData():
     def loadProcessingBatch(self,*,key):
         obj=kb.loadObject(key=key)
         job_results=obj['job_results']
+        num_sorting_results=0
+        num_recording_summary_results=0
         for X in job_results:
             if X['job']['command']=='sort_recording':
                 study_name=X['job']['recording']['study']
@@ -176,7 +178,7 @@ class SFData():
                 result=X['result']
                 S=self.study(study_name)
                 D=S.recording(recording_name)
-                print('Loading sorting result: '+X['job']['label'])
+                num_sorting_results=num_sorting_results+1
                 D.addSortingResult(result)
             elif X['job']['command']=='summarize_recording':
                 study_name=X['job']['recording']['study']
@@ -185,10 +187,11 @@ class SFData():
                 result=X['result']
                 S=self.study(study_name)
                 D=S.recording(recording_name)
-                print('Loading summary result: '+X['job']['label'])
+                num_recording_summary_results=num_recording_summary_results+1
                 D.setSummaryResult(result)
             else:
                 pass
+        print('Loaded {} sorting results and {} recording summary results'.format(num_sorting_results,num_recording_summary_results))
 
     def studyNames(self):
         return self._study_names

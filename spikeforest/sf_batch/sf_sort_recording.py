@@ -101,7 +101,7 @@ class IronClust(mlpr.Processor):
         
 class SpykingCircus(mlpr.Processor):
     NAME='SpykingCircus'
-    VERSION='0.1.1'
+    VERSION='0.1.2'
     
     recording_dir=mlpr.Input('Directory of recording',directory=True)
     channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
@@ -127,7 +127,7 @@ class SpykingCircus(mlpr.Processor):
               recording=si.SubRecordingExtractor(parent_recording=recording,channel_ids=self.channels)
             if not os.path.exists(tmpdir):
                 os.mkdir(tmpdir)
-            sorting=st.sorters.spyking_circus(
+            sorting=sf.sorters.spyking_circus(
                 recording=recording,
                 output_folder=tmpdir,
                 probe_file=None,
@@ -137,7 +137,7 @@ class SpykingCircus(mlpr.Processor):
                 spike_thresh=self.spike_thresh,
                 template_width_ms=self.template_width_ms,
                 filter=self.filter,
-                merge_spikes=False,
+                merge_spikes=True,
                 n_cores=num_workers,
                 electrode_dimensions=None,
                 whitening_max_elts=self.whitening_max_elts,
