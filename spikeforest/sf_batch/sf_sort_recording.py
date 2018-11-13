@@ -101,7 +101,7 @@ class IronClust(mlpr.Processor):
         
 class SpykingCircus(mlpr.Processor):
     NAME='SpykingCircus'
-    VERSION='0.1.0'
+    VERSION='0.1.1'
     
     recording_dir=mlpr.Input('Directory of recording',directory=True)
     channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
@@ -112,7 +112,6 @@ class SpykingCircus(mlpr.Processor):
     spike_thresh=mlpr.FloatParameter(optional=True,default=6,description='Threshold for detection')
     template_width_ms=mlpr.FloatParameter(optional=True,default=3,description='Spyking circus parameter')
     filter=mlpr.BoolParameter(optional=True,default=True)
-    merge_spikes=mlpr.BoolParameter(optional=True,default=True)
     whitening_max_elts=mlpr.IntegerParameter(optional=True,default=1000,description='I believe it relates to subsampling and affects compute time')
     clustering_max_elts=mlpr.IntegerParameter(optional=True,default=10000,description='I believe it relates to subsampling and affects compute time')
     
@@ -138,7 +137,7 @@ class SpykingCircus(mlpr.Processor):
                 spike_thresh=self.spike_thresh,
                 template_width_ms=self.template_width_ms,
                 filter=self.filter,
-                merge_spikes=self.merge_spikes,
+                merge_spikes=False,
                 n_cores=num_workers,
                 electrode_dimensions=None,
                 whitening_max_elts=self.whitening_max_elts,
