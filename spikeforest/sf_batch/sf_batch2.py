@@ -9,6 +9,13 @@ def clear_job_results(*,batch_name,incomplete_only=True):
   jobs=batch['jobs']
   for job in jobs:
     clear_job_result(job,incomplete_only=incomplete_only)
+
+def download_recordings(*,batch_name):
+  batch=kb.loadObject(key=dict(batch_name=batch_name))
+  jobs=batch['jobs']
+  for job in jobs:
+    dsdir=job['recording']['directory']
+    kb.realizeFile(dsdir+'/raw.mda')
     
 def run_jobs(*,batch_name):
   batch=kb.loadObject(key=dict(batch_name=batch_name))
