@@ -174,13 +174,16 @@ def sf_sort_recording(sorter,recording):
         **sorting_params
     ).outputs
     firings_out=kb.saveFile(outputs['firings_out'])
+    firings_true_path=recording['directory']+'/firings_true.mda'
+    if not kb.findFile(firings_true_path):
+        firings_true_path=None
     result=dict(
         recording_name=recording['name'],
         study_name=recording['study'],
         sorter_name=sorter['name'],
         recording_dir=dsdir,
         channels=recording.get('channels',[]),
-        firings_true=recording.get('firings_true',None),
+        firings_true=firings_true_path,
         sorting_params=sorting_params,
         sorting_processor_name=SS.NAME,
         sorting_processor_version=SS.VERSION,
