@@ -3,6 +3,7 @@ import string
 from kbucket import client as kb
 from pairio import client as pa
 from .sf_sort_recording import sf_sort_recording
+from .sf_summarize_recording import sf_summarize_recording
 
 def clear_job_results(*,batch_name,incomplete_only=True):
   batch=kb.loadObject(key=dict(batch_name=batch_name))
