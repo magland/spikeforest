@@ -43,6 +43,7 @@ class SFSortingResult():
             else:
                 raise Exception('Invalid format: '+format)
     def comparisonWithTruth(self,*,format='dataframe'):
+        display(self._obj)
         A=self._obj['comparison_with_truth']
         if format=='html':
             return kb_read_text_file(A['html'])
