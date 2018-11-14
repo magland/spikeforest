@@ -51,6 +51,9 @@ def clear_job_result(job,*,incomplete_only=True):
 def do_sort_recording(job):
   return sf_sort_recording(sorter=job['sorter'],recording=job['recording'])
 
+def do_summarize_recording(job):
+  return sf_summarize_recording(recording=job['recording'])
+
 def do_run_job(job):
   if job['command']=='sort_recording':
     return do_sort_recording(job)
