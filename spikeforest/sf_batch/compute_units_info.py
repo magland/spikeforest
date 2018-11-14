@@ -138,8 +138,12 @@ class ComputeUnitsInfo(mlpr.Processor):
     write_json_file(self.json_out,ret)
   
   
-def compute_units_info(*,recording_dir,firings,channel_ids=[],unit_ids=[]):
+## return format can be 'json' or 'filename'
+def compute_units_info(*,recording_dir,firings,channel_ids=[],unit_ids=[],return_format='json'):
     out=ComputeUnitsInfo.execute(recording_dir=recording_dir,firings=firings,unit_ids=unit_ids,channel_ids=channel_ids,json_out={'ext':'.json'}).outputs
     fname=out['json_out']
-    with open(fname) as f:
-      return json.load(f)
+    if return_format=='filename':
+      return fname
+    else:
+      with open(fname) as f:
+        return json.load(f)

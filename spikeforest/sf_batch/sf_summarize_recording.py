@@ -21,7 +21,9 @@ def sf_summarize_recording(recording):
   if kb.findFile(firings_true_path):
     ret['firings_true']=firings_true_path
     ret['plots']['waveforms_true']=create_waveforms_plot(recording,ret['firings_true'])
-    ret['true_units_info']=compute_units_info(recording_dir=recording['directory'],firings=firings_true_path)
+    true_units_info_fname=compute_units_info(recording_dir=recording['directory'],firings=firings_true_path,return_format='filename')
+    kb.saveFile(true_units_info_fname)
+    ret['true_units_info']='sha1://'+kb.computeFileSha1(true_units_info_fname)+'/true_units_info.json'
   return ret
 
 def read_json_file(fname):

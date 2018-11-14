@@ -98,7 +98,7 @@ class SFRecording():
             else:
                 raise Exception('Invalid format: '+format)
     def trueUnitsInfo(self,format='dataframe'):
-        B=kb_read_json_file(self._summary_result['true_units_info'])
+        B=self._summary_result['true_units_info']
         if format=='json':
             return B
         elif format=='dataframe':
@@ -184,7 +184,6 @@ class SFData():
             elif X['job']['command']=='summarize_recording':
                 study_name=X['job']['recording']['study']
                 recording_name=X['job']['recording']['name']
-                sorter_name=X['job']['sorter']['name']
                 result=X['result']
                 S=self.study(study_name)
                 D=S.recording(recording_name)
