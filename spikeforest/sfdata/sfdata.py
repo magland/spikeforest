@@ -119,7 +119,7 @@ class SFRecording():
     def sortingResultNames(self):
         return self._sorting_result_names
     def sortingResult(self,name):
-        return self._sorting_results_by_name[name]
+        return self._sorting_results_by_name.get(name,None)
 
 class SFStudy():
     def __init__(self,obj):
@@ -143,7 +143,7 @@ class SFStudy():
     def recordingNames(self):
         return self._recording_names
     def recording(self,name):
-        return self._recordings_by_name[name]
+        return self._recordings_by_name.get(name,None)
         
 
 class SFData():
@@ -179,17 +179,29 @@ class SFData():
                 sorter_name=X['job']['sorter']['name']
                 result=X['result']
                 S=self.study(study_name)
-                D=S.recording(recording_name)
-                num_sorting_results=num_sorting_results+1
-                D.addSortingResult(result)
+                if S:
+                    D=S.recording(recording_name)
+                    if D:
+                        num_sorting_results=num_sorting_results+1
+                        D.addSortingResult(result)
+                    else:
+                        print('Warning: recording not found: '+recording_name)
+                else:
+                    print('Warning: study not found: '+study_name)
             elif X['job']['command']=='summarize_recording':
                 study_name=X['job']['recording']['study']
                 recording_name=X['job']['recording']['name']
                 result=X['result']
                 S=self.study(study_name)
-                D=S.recording(recording_name)
-                num_recording_summary_results=num_recording_summary_results+1
-                D.setSummaryResult(result)
+                if S:
+                    D=S.recording(recording_name)
+                    if D:
+                        num_recording_summary_results=num_recording_summary_results+1
+                        D.setSummaryResult(result)
+                    else:
+                        print('Warning: recording not found: '+recording_name)
+                else:
+                    print('Warning: study not found: '+study_name)
             else:
                 pass
         print('Loaded {} sorting results and {} recording summary results'.format(num_sorting_results,num_recording_summary_results))
@@ -197,4 +209,4 @@ class SFData():
     def studyNames(self):
         return self._study_names
     def study(self,name):
-        return self._studies_by_name[name]
+        return self._studies_by_name.get(name,None)
