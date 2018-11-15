@@ -18,10 +18,12 @@ def sf_summarize_recording(recording):
   ret['plots']=dict(
     timeseries=create_timeseries_plot(recording)
   )
+  channels=recording.get('channels',None)
+  units=recording.get('units_true',None)
   if kb.findFile(firings_true_path):
     ret['firings_true']=firings_true_path
     ret['plots']['waveforms_true']=create_waveforms_plot(recording,ret['firings_true'])
-    true_units_info_fname=compute_units_info(recording_dir=recording['directory'],firings=firings_true_path,return_format='filename')
+    true_units_info_fname=compute_units_info(recording_dir=recording['directory'],firings=firings_true_path,return_format='filename',channel_ids=channels,unit_ids=units)
     kb.saveFile(true_units_info_fname)
     ret['true_units_info']='sha1://'+kb.computeFileSha1(true_units_info_fname)+'/true_units_info.json'
   return ret
@@ -54,7 +56,7 @@ class ComputeRecordingInfo(mlpr.Processor):
     recording=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=False)
     if len(self.channels)>0:
       recording=si.SubRecordingExtractor(parent_recording=recording,channel_ids=self.channels)
-    ret['samplerate']=recording.getSOamplingFrequency()
+    ret['samplerate']=recording.getSamplingFrequency()
     ret['num_channels']=len(recording.getChannelIds())
     ret['duration_sec']=recording.getNumFrames()/ret['samplerate']
     write_json_file(self.json_out,ret)
@@ -103,6 +105,7 @@ class CreateWaveformsPlot(mlpr.Processor):
   VERSION='0.1.0'
   recording_dir=mlpr.Input(directory=True,description='Recording directory')
   channels=mlpr.IntegerListParameter(description='List of channels to use.',optional=True,default=[])
+  units=mlpr.IntegerListParameter(description='List of units to use.',optional=True,default=[])
   firings=mlpr.Input(description='Firings file')
   jpg_out=mlpr.Output('The plot as a .jpg file')
   
@@ -115,7 +118,10 @@ class CreateWaveformsPlot(mlpr.Processor):
     channels=R.getChannelIds()
     if len(channels)>20:
       channels=channels[0:20]
-    units=S.getUnitIds()
+    if len(self.units)>0:
+      units=self.units
+    else:
+      units=S.getUnitIds()
     if len(units)>20:
       units=units[::int(len(units)/20)]
     sw.UnitWaveformsWidget(recording=R,sorting=S,channels=channels,unit_ids=units).plot()
@@ -125,6 +131,7 @@ def create_waveforms_plot(recording,firings):
   out=CreateWaveformsPlot.execute(
     recording_dir=recording['directory'],
     channels=recording.get('channels',[]),
+    units=recording.get('units_true',[]),
     firings=firings,
     jpg_out={'ext':'.jpg'}
   ).outputs['jpg_out']

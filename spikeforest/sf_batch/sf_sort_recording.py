@@ -183,6 +183,7 @@ def sf_sort_recording(sorter,recording):
         sorter_name=sorter['name'],
         recording_dir=dsdir,
         channels=recording.get('channels',[]),
+        units_true=recording.get('units_true',[]),
         firings_true=firings_true_path,
         sorting_params=sorting_params,
         sorting_processor_name=SS.NAME,

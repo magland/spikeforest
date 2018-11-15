@@ -3,6 +3,7 @@ import json
 import mlprocessors as mlpr
 import spikeinterface as si
 import spikewidgets as sw
+from kbucket import client as kb
 
 def write_json_file(fname,obj):
   with open(fname, 'w') as f:
@@ -145,5 +146,14 @@ def compute_units_info(*,recording_dir,firings,channel_ids=[],unit_ids=[],return
     if return_format=='filename':
       return fname
     else:
+      fname=kb.realizeFile(fname)
       with open(fname) as f:
         return json.load(f)
+
+def select_units_on_channels(recording_dir,firings,channels):
+  info=compute_units_info(recording_dir=recording_dir,firings=firings)
+  units=[]
+  for info0 in info:
+    if info0['peak_channel'] in channels:
+      units.append(info0['unit_id'])
+  return units
