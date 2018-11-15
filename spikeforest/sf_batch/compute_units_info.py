@@ -117,7 +117,7 @@ class ComputeUnitsInfo(mlpr.Processor):
     recording_sub=MemoryRecordingExtractor(parent_recording=recording_sub)
     sorting_sub=si.SubSortingExtractor(parent_sorting=sorting,start_frame=0,end_frame=ef)
     unit_ids=self.unit_ids
-    if len(unit_ids)==0:
+    if (not unit_ids) or (len(unit_ids)==0):
       unit_ids=sorting.getUnitIds()
   
     channel_noise_levels=compute_channel_noise_levels(recording=recording)
