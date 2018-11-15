@@ -108,7 +108,7 @@ class ComputeUnitsInfo(mlpr.Processor):
   
   def run(self):
     R0=si.MdaRecordingExtractor(dataset_directory=self.recording_dir,download=True)
-    if len(self.channel_ids)>0:
+    if (self.channel_ids) and (len(self.channel_ids)>0):
       R0=si.SubRecordingExtractor(parent_recording=R0,channel_ids=self.channel_ids)
     recording=sw.lazyfilters.bandpass_filter(recording=R0,freq_min=300,freq_max=6000)
     sorting=si.MdaSortingExtractor(firings_file=self.firings)
