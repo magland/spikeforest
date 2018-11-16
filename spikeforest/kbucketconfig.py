@@ -35,7 +35,9 @@ def kbucketConfigRemote(*,user='spikeforest',share_id='spikeforest.spikeforest2'
   )
   if write:
     if password is None:
-      password=getpass.getpass('Enter the spikeforest password')
+      password=getpass.getpass('Enter the spikeforest password (or leave blank for read-only)')
+    if not password:
+      return
     pa.setConfig(
         user=user,
         token=pa.get(collection='spikeforest',key=dict(name='pairio_token',user=user,password=password)),
