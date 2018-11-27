@@ -4,7 +4,7 @@ pkg_name="spikeforest"
 
 setuptools.setup(
     name=pkg_name,
-    version="0.3.4",
+    version="0.3.5",
     author="Jeremy Magland",
     author_email="jmagland@flatironinstitute.org",
     description="",
@@ -21,7 +21,8 @@ setuptools.setup(
         'kbucket',
         'pillow',
         'mlprocessors',
-        'pandas'
+        'pandas',
+        'vdomr'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",

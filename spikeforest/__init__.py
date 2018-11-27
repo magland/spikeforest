@@ -8,3 +8,4 @@ from .sfdata import SFData
 from . import batch
 from . import sorters
 from . import sf_batch
+from .sfselectwidget import SFSelectWidget
