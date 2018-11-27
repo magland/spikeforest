@@ -1,4 +1,4 @@
-import spikeinterface as si
+import spikeextractors as si
 import numpy as np
 
 class MultiInputExtractor(si.InputExtractor):

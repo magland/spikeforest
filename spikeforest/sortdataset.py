@@ -1,5 +1,5 @@
 from kbucket import client as kb
-import spikeinterface as si
+import spikeextractors as si
 import spikeforest as sf
 import tempfile
 import random

@@ -1,5 +1,5 @@
 import numpy as np
-import spikeinterface as si
+import spikeextractors as si
 from scipy.optimize import linear_sum_assignment
 
 class SortingComparison():

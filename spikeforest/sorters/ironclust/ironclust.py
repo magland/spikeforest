@@ -1,4 +1,4 @@
-import spikeinterface as si
+import spikeextractors as si
 import os
 from mountainlab_pytools import mdaio
 from spiketoolkit.sorters.tools import run_command_and_print_output

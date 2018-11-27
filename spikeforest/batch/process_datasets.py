@@ -3,7 +3,7 @@
 from kbucket import client as kb
 from pairio import client as pa
 import spikeforest as sf
-import spikeinterface as si
+import spikeextractors as si
 import spikewidgets as sw
 import spiketoolkit as st
 from copy import deepcopy

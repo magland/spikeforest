@@ -1,6 +1,6 @@
 from mountainlab_pytools import mlproc as mlp
 from mountainlab_pytools import mdaio
-import spikeinterface as si
+import spikeextractors as si
 import os, sys
 import numpy as np
 import json

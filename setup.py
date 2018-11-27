@@ -15,7 +15,7 @@ setuptools.setup(
         'ml_ms4alg',
         'numpy',
         'matplotlib',
-        'spikeinterface',
+        'spikeextractors',
         'spikewidgets',
         'spiketoolkit',
         'kbucket',
