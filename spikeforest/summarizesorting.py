@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from PIL import Image
 import mlprocessors as mlpr
 from kbucket import client as kb
-import spikeinterface as si
+import spikeextractors as si
 import spikewidgets as sw
 import os
 

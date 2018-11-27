@@ -1,5 +1,5 @@
 from kbucket import client as kb
-import spikeinterface as si
+import spikeextractors as si
 
 def mountainsort4b_params(
     detect_sign, # Use -1, 0, or 1, depending on the sign of the spikes in the recording

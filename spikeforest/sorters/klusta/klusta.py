@@ -1,4 +1,4 @@
-import spikeinterface as si
+import spikeextractors as si
 import os
 from os.path import join
 import time

@@ -1,5 +1,5 @@
 from mountainlab_pytools import mlproc as mlp
-import spikeinterface as si
+import spikeextractors as si
 
 class SFStudy():
   def __init__(self):

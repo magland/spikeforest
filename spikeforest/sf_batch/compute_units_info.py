@@ -1,7 +1,7 @@
 import numpy as np
 import json
 import mlprocessors as mlpr
-import spikeinterface as si
+import spikeextractors as si
 import spikewidgets as sw
 from kbucket import client as kb
 

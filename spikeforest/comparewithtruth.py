@@ -1,4 +1,4 @@
-import spikeinterface as si
+import spikeextractors as si
 import spikewidgets as sw
 import spiketoolkit as st
 import mlprocessors as mlpr

@@ -2,7 +2,7 @@ from kbucket import client as kb
 from PIL import Image
 import json
 import pandas as pd
-import spikeinterface as si
+import spikeextractors as si
 
 def kb_read_text_file(fname):
     fname=kb.realizeFile(fname)
