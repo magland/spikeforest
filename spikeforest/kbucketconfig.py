@@ -55,7 +55,21 @@ def kbucketConfigLocal(write=True):
         write_local=True,
     )
 
-def kbucketConfigRemote(*,user='spikeforest',share_id='spikeforest.spikeforest2',password=None,write=False):
+def kbucketConfigRemote(*,name='spikeforest1-readonly',collection='spikeforest',password=None,ask_password=False,verbose=False,return_config=False):
+  if ask_password:
+    password=getpass.getpass('Enter password: ')
+    if not password:
+      raise Exception('No password entered')
+
+  key=dict(name=name)
+  if password:
+    key2=dict(key=key,password=password)
+  else:
+    key2=key
+
+  return setKBucketConfig(collection=collection,key=key2,verbose=verbose,return_config=return_config)
+
+def kbucketConfigRemoteOld(*,user='spikeforest',share_id='spikeforest.spikeforest2',password=None,write=False):
   pa.setConfig(
       collections=[user],
       user='',
