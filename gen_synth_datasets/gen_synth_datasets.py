@@ -25,7 +25,7 @@ def gen_synth_datasets(datasets,*,outdir):
         waveforms,geom=synthesize_random_waveforms(K=K,M=num_channels,average_peak_amplitude=-100,upsamplefac=upsamplefac)
         times,labels=synthesize_random_firings(K=K,duration=duration,samplerate=samplerate)
         labels=labels.astype(np.int64)
-        OX=si.NumpyOutputExtractor()
+        OX=si.NumpySortingExtractor()
         OX.setTimesLabels(times,labels)
         X=synthesize_timeseries(
             output_extractor=OX,
@@ -35,7 +35,7 @@ def gen_synth_datasets(datasets,*,outdir):
             duration=duration,
             waveform_upsamplefac=upsamplefac
         )
-        IX=si.NumpyInputExtractor(timeseries=X,samplerate=samplerate,geom=geom)
-        si.MdaInputExtractor.writeDataset(IX,outdir+'/{}'.format(ds_name))
-        si.MdaOutputExtractor.writeFirings(OX,outdir+'/{}/firings_true.mda'.format(ds_name))
+        IX=si.NumpyRecordingExtractor(timeseries=X,samplerate=samplerate,geom=geom)
+        si.MdaRecordingExtractor.writeRecording(IX,outdir+'/{}'.format(ds_name))
+        si.MdaSortingExtractor.writeSorting(OX, outdir+'/{}/firings_true.mda'.format(ds_name))
     print('Done.')
