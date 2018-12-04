@@ -9,8 +9,7 @@ from synthesize_timeseries import synthesize_timeseries
 import h5py
 from scipy import signal
 
-def gen_synth_datasets(datasets,*,outdir):
-    samplerate=32000
+def gen_synth_datasets(datasets,*,outdir,samplerate=32000):
     if not os.path.exists(outdir):
         os.mkdir(outdir)
     for ds in datasets:
@@ -34,9 +33,9 @@ def gen_synth_datasets(datasets,*,outdir):
             samplerate=samplerate,
             duration=ds['duration']
         )
-        IX=si.NumpyInputExtractor(timeseries=X,samplerate=samplerate,geom=geom)
-        si.MdaInputExtractor.writeDataset(IX,outdir+'/{}'.format(ds_name))
-        si.MdaOutputExtractor.writeFirings(OX,outdir+'/{}/firings_true.mda'.format(ds_name))
+        IX=si.NumpyRecordingExtractor(timeseries=X,samplerate=samplerate,geom=geom)
+        si.MdaRecordingExtractor.writeRecording(IX,outdir+'/{}'.format(ds_name))
+        si.MdaSortingExtractor.writeSorting(OX,outdir+'/{}/firings_true.mda'.format(ds_name))
     print('Done.')
     
 def gen_spiketrains(*,duration,n_exc,n_inh,f_exc,f_inh,st_exc,st_inh,min_rate):
@@ -88,9 +87,9 @@ def gen_recording(*,templates,output_extractor,noise_level,samplerate,duration):
     #mdaio.writemda32(X,recording_out)
     return X, geom
     
-class NeoSpikeTrainsOutputExtractor(si.OutputExtractor):
+class NeoSpikeTrainsOutputExtractor(si.SortingExtractor):
     def __init__(self, *, spiketrains, samplerate):
-        si.OutputExtractor.__init__(self)
+        si.SortingExtractor.__init__(self)
         self._spiketrains=spiketrains
         self._fs=samplerate
         self._num_units = len(spiketrains)
