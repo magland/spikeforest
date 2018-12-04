@@ -76,8 +76,12 @@ class SFRecording():
         return self._obj['description']
     def directory(self):
         return self._obj['directory']
-    def recording(self,download=False):
-        return si.MdaRecordingExtractor(dataset_directory=self.directory(),download=download)
+    def recordingExtractor(self,download=False):
+        X=si.MdaRecordingExtractor(dataset_directory=self.directory(),download=download)
+        if 'channels' in self._obj:
+            if self._obj['channels']:
+                X=si.SubRecordingExtractor(parent_recording=X,channel_ids=self._obj['channels'])
+        return X
     def sortingTrue(self):
         return si.MdaSortingExtractor(firings_file=self.directory()+'/firings_true.mda')
     def plotNames(self):

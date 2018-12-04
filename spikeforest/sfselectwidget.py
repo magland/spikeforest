@@ -41,6 +41,7 @@ class SelectBox(vd.Component):
 class SFSelectWidget(vd.Component):
   def __init__(self,sfdata,mode):
     vd.Component.__init__(self)
+    self._on_change_handlers=[]
     self._SF=sfdata
     self._study_box=SelectBox()
     self._recording_box=SelectBox()
@@ -51,8 +52,13 @@ class SFSelectWidget(vd.Component):
     self._recording_box.onChange(self._on_change)
     self._sorting_result_box.onChange(self._on_change)
 
+  def onChange(self,handler):
+    self._on_change_handlers.append(handler)
+
   def _on_change(self,value):
     self.refresh()
+    for handler in self._on_change_handlers:
+      handler()
   def study(self):
     name=self._study_box.value()
     return self._SF.study(name) if name else None

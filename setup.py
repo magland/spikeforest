@@ -22,7 +22,10 @@ setuptools.setup(
         'pillow',
         'mlprocessors',
         'pandas',
-        'vdomr'
+        'vdomr',
+        'elephant',
+        'click',
+        'MEAutility'
     ],
     classifiers=(
         "Programming Language :: Python :: 3",
