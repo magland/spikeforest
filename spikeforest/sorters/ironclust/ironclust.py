@@ -1,7 +1,7 @@
 import spikeextractors as si
 import os
 from mountainlab_pytools import mdaio
-from spiketoolkit.sorters.tools import run_command_and_print_output
+import subprocess, shlex
 
 def ironclust(*,
     recording, # Recording object
@@ -55,7 +55,7 @@ def ironclust(*,
         .format(tmpdir, dataset_dir+'/raw.mda', dataset_dir+'/geom.csv', tmpdir+'/firings.mda', dataset_dir+'/argfile.txt')
     cmd='matlab -nosplash -nodisplay -r "{} {} quit;"'.format(cmd_path, cmd_call)
     print(cmd)
-    retcode=run_command_and_print_output(cmd)
+    retcode=_run_command_and_print_output(cmd)
 
     if retcode != 0:
         raise Exception('IronClust returned a non-zero exit code')
@@ -77,3 +77,17 @@ def _read_text_file(fname):
 def _write_text_file(fname,str):
     with open(fname,'w') as f:
         f.write(str)
+
+def _run_command_and_print_output(command):
+    with subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        while True:
+            output_stdout= process.stdout.readline()
+            output_stderr = process.stderr.readline()
+            if (not output_stdout) and (not output_stderr) and (process.poll() is not None):
+                break
+            if output_stdout:
+                print(output_stdout.decode())
+            if output_stderr:
+                print(output_stderr.decode())
+        rc = process.poll()
+        return rc

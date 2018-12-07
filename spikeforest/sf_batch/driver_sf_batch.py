@@ -23,7 +23,7 @@ if __name__ == '__main__':
       raise Exception('Environment variable not set: SPIKEFOREST_PASSWORD')
     
     print('Loading batch: '+batch_name)
-    sf.kbucketConfigRemote(share_id='spikeforest.spikeforest1',write=True,password=spikeforest_password)
+    sf.kbucketConfigRemote(name='spikeforest1-readwrite',password=spikeforest_password)
     obj=kb.loadObject(key=dict(batch_name=batch_name))
     if not obj:
       raise Exception('Unable to find batches object.')

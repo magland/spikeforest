@@ -4,7 +4,7 @@ import os
 import time
 import numpy as np
 from os.path import join
-from spiketoolkit.sorters.tools import run_command_and_print_output
+import subprocess, shlex
 
 def kilosort(
         recording,
@@ -120,7 +120,7 @@ def kilosort(
     print(os.getcwd())
     cmd = 'matlab -nosplash -nodisplay -r "run kilosort_master.m; quit;"'
     print(cmd)
-    retcode = run_command_and_print_output(cmd)
+    retcode = _run_command_and_print_output(cmd)
 
     if retcode != 0:
         raise Exception('KiloSort returned a non-zero exit code')
@@ -129,3 +129,17 @@ def kilosort(
     sorting = si.KiloSortSortingExtractor(join(output_folder, 'results'))
     os.chdir(cwd)
     return sorting
+
+def _run_command_and_print_output(command):
+    with subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        while True:
+            output_stdout= process.stdout.readline()
+            output_stderr = process.stderr.readline()
+            if (not output_stdout) and (not output_stderr) and (process.poll() is not None):
+                break
+            if output_stdout:
+                print(output_stdout.decode())
+            if output_stderr:
+                print(output_stderr.decode())
+        rc = process.poll()
+        return rc

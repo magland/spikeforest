@@ -4,7 +4,7 @@ import os
 import time
 import numpy as np
 from os.path import join
-from spiketoolkit.sorters.tools import run_command_and_print_output
+import subprocess, shlex
 
 def spyking_circus(
         recording,
@@ -87,11 +87,11 @@ def spyking_circus(
     cmd_merge = 'spyking-circus {} -m merging -c {} '.format(join(output_folder, file_name+'.npy'), n_cores)
     # cmd_convert = 'spyking-circus {} -m converting'.format(join(output_folder, file_name+'.npy'))
     print(cmd)
-    retcode = run_command_and_print_output(cmd)
+    retcode = _run_command_and_print_output(cmd)
     if retcode != 0:
         raise Exception('Spyking circus returned a non-zero exit code')
     print(cmd_merge)
-    retcode = run_command_and_print_output(cmd_merge)
+    retcode = _run_command_and_print_output(cmd_merge)
     if retcode != 0:
         raise Exception('Spyking circus merging returned a non-zero exit code')
     processing_time = time.time() - t_start_proc
@@ -99,3 +99,17 @@ def spyking_circus(
     sorting = si.SpykingCircusSortingExtractor(join(output_folder, file_name))
 
     return sorting
+
+def _run_command_and_print_output(command):
+    with subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        while True:
+            output_stdout= process.stdout.readline()
+            output_stderr = process.stderr.readline()
+            if (not output_stdout) and (not output_stderr) and (process.poll() is not None):
+                break
+            if output_stdout:
+                print(output_stdout.decode())
+            if output_stderr:
+                print(output_stderr.decode())
+        rc = process.poll()
+        return rc
